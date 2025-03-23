@@ -1,0 +1,415 @@
+[
+  {
+    "model": "auth.user",
+    "fields": {
+      "username": "user1",
+      "password": "user1"
+    }
+  },
+  {
+    "model": "auth.user",
+    "fields": {
+      "username": "user2",
+      "password": "user2"
+    }
+  },
+  {
+    "model": "auth.user",
+    "fields": {
+      "username": "user3",
+      "password": "user3"
+    }
+  },
+  {
+    "model": "auth.user",
+    "fields": {
+      "username": "user4",
+      "password": "user4"
+    }
+  },
+  {
+    "model": "auth.user",
+    "fields": {
+      "username": "user5",
+      "password": "user5"
+    }
+  },
+  {
+    "model": "cooking.recipe",
+    "pk": 1,
+    "fields": {
+      "author": 1,
+      "title": "Паста Карбонара",
+      "picture": "pictures/pasta_carbonara.jpg",
+      "description": "Классический рецепт итальянской пасты карбонара с беконом, яйцами и пармезаном.",
+      "cooking_time": "25"
+    }
+  },
+  {
+    "model": "cooking.recipe",
+    "pk": 2,
+    "fields": {
+      "author": 2,
+      "title": "Шоколадный торт",
+      "picture": "pictures/chocolate_cake.jpg",
+      "description": "Нежный и вкусный шоколадный торт для особого случая.",
+      "cooking_time": "90"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 1,
+    "fields": {
+      "title": "Спагетти",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 2,
+    "fields": {
+      "title": "Бекон",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 3,
+    "fields": {
+      "title": "Яйца",
+      "unit": "шт"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 4,
+    "fields": {
+      "title": "Пармезан",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 5,
+    "fields": {
+      "title": "Мука",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 6,
+    "fields": {
+      "title": "Какао",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 7,
+    "fields": {
+      "title": "Сахар",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.ingredient",
+    "pk": 8,
+    "fields": {
+      "title": "Сливочное масло",
+      "unit": "г"
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 1,
+    "fields": {
+      "recipe": 1,
+      "ingredient": 1,
+      "quantity": 200
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 2,
+    "fields": {
+      "recipe": 1,
+      "ingredient": 2,
+      "quantity": 100
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 3,
+    "fields": {
+      "recipe": 1,
+      "ingredient": 3,
+      "quantity": 2
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 4,
+    "fields": {
+      "recipe": 1,
+      "ingredient": 4,
+      "quantity": 50
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 5,
+    "fields": {
+      "recipe": 2,
+      "ingredient": 5,
+      "quantity": 250
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 6,
+    "fields": {
+      "recipe": 2,
+      "ingredient": 6,
+      "quantity": 50
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 7,
+    "fields": {
+      "recipe": 2,
+      "ingredient": 7,
+      "quantity": 200
+    }
+  },
+  {
+    "model": "cooking.recipeingredient",
+    "pk": 8,
+    "fields": {
+      "recipe": 2,
+      "ingredient": 8,
+      "quantity": 150
+    }
+  },
+  {
+    "model": "cooking.follow",
+    "pk": 1,
+    "fields": {
+      "author": 2,
+      "user": 1
+    }
+  },
+  {
+    "model": "cooking.favourites",
+    "pk": 1,
+    "fields": {
+      "recipe": 1,
+      "user": 3
+    }
+  },
+    {
+    "model": "cooking.favourites",
+    "pk": 2,
+    "fields": {
+      "recipe": 2,
+      "user": 3
+    }
+  },
+  {
+    "model": "cooking.soppinglist",
+    "pk": 1,
+    "fields": {
+      "recipe": 2,
+      "user": 1
+    }
+  },
+  {
+        "model": "cooking.recipe",
+        "fields": {
+            "author": 2,
+            "title": "Цезарь с курицей",
+            "picture": "pictures/caesar_chicken.jpg",
+            "description": "Салат Цезарь с куриным филе, хрустящими гренками и пармезаном.",
+            "cooking_time": "15"
+        }
+    },
+    {
+        "model": "cooking.recipe",
+        "fields": {
+            "author": 3,
+            "title": "Шоколадный торт",
+            "picture": "pictures/chocolate_cake.jpg",
+            "description": "Нежный шоколадный торт с кремом и ягодами.",
+            "cooking_time": "60"
+        }
+    },
+    {
+        "model": "cooking.recipe",
+        "fields": {
+            "author": 1,
+            "title": "Овощное рагу",
+            "picture": "pictures/vegetable_stew.jpg",
+            "description": "Сытное овощное рагу с картофелем, морковью и специями.",
+            "cooking_time": "40"
+        }
+    },
+    {
+        "model": "cooking.recipe",
+        "fields": {
+            "author": 2,
+            "title": "Пирог с яблоками",
+            "picture": "pictures/apple_pie.jpg",
+            "description": "Вкусный пирог с яблоками и корицей.",
+            "cooking_time": "50"
+        }
+    },
+    {
+        "model": "cooking.ingredient",
+        "fields": {
+            "title": "Помидоры",
+            "unit": "кг"
+        }
+    },
+    {
+        "model": "cooking.ingredient",
+        "fields": {
+            "title": "Огурцы",
+            "unit": "шт"
+        }
+    },
+    {
+        "model": "cooking.ingredient",
+        "fields": {
+            "title": "Соль",
+            "unit": "г"
+        }
+    },
+    {
+        "model": "cooking.ingredient",
+        "fields": {
+            "title": "Перец",
+            "unit": "г"
+        }
+    },
+    {
+        "model": "cooking.recipeingredient",
+        "fields": {
+            "recipe": 4,
+            "ingredient": 2,
+            "quantity": 5
+        }
+    },
+    {
+        "model": "cooking.recipeingredient",
+        "fields": {
+            "recipe": 5,
+            "ingredient": 2,
+            "quantity": 3
+        }
+    },
+    {
+        "model": "cooking.recipeingredient",
+        "fields": {
+            "recipe": 6,
+            "ingredient": 1,
+            "quantity": 2
+        }
+    },
+    {
+        "model": "cooking.recipeingredient",
+        "fields": {
+            "recipe": 5,
+            "ingredient": 3,
+            "quantity": 4
+        }
+    },
+    {
+        "model": "cooking.follow",
+        "fields": {
+            "author": 2,
+            "user": 4
+        }
+    },
+    {
+        "model": "cooking.follow",
+        "fields": {
+            "author": 3,
+            "user": 1
+        }
+    },
+    {
+        "model": "cooking.follow",
+        "fields": {
+            "author": 1,
+            "user": 2
+        }
+    },
+    {
+      "model": "cooking.favourites",
+      "fields": {
+        "recipe": 5,
+        "user": 3
+      }
+    },
+    {
+      "model": "cooking.favourites",
+      "fields": {
+        "recipe": 6,
+        "user": 1
+      }
+    },
+    {
+      "model": "cooking.favourites",
+      "fields": {
+        "recipe": 4,
+        "user": 2
+      }
+    },
+    {
+      "model": "cooking.favourites",
+      "fields": {
+        "recipe": 2,
+        "user": 2
+      }
+    },
+    {
+      "model": "cooking.favourites",
+      "fields": {
+        "recipe": 4,
+        "user": 3
+      }
+    },
+    {
+      "model": "cooking.soppinglist",
+      "pk": 1,
+      "fields": {
+        "recipe": 2,
+        "user": 1
+      }
+    },
+    {
+      "model": "cooking.soppinglist",
+      "pk": 2,
+      "fields": {
+        "recipe": 3,
+        "user": 1
+      }
+    },
+    {
+      "model": "cooking.soppinglist",
+      "pk": 3,
+      "fields": {
+        "recipe": 1,
+        "user": 2
+      }
+    },
+    {
+      "model": "cooking.soppinglist",
+      "pk": 4,
+      "fields": {
+        "recipe": 4,
+        "user": 3
+      }
+    }
+]
