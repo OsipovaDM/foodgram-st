@@ -1,7 +1,7 @@
-from django.contrib.auth import get_user_model
-from django.db import models
+from django.contrib.auth import get_user_model  # Модель пользователя
+from django.db import models  # Основная модель
 
-User = get_user_model()
+User = get_user_model()  # Получаем модель пользователя
 
 
 class Recipe(models.Model):
@@ -22,9 +22,11 @@ class Recipe(models.Model):
         constraints = (
             models.UniqueConstraint(fields=('author', 'title'), name='AuthorTitle'),
         )
+        # Человекочитаемое имя
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
 
+    # Отображение при обращении к объекту
     def __str__(self):
         return self.title
 
@@ -45,6 +47,7 @@ class BaseModel(models.Model):
         )
         abstract = True
 
+    # Отображение при обращении к объекту
     def __str__(self):
         return self.user.__str__() + ' -- ' + self.recipe.__str__()
 
@@ -59,9 +62,11 @@ class Ingredient(models.Model):
         'Единица измерения', max_length=50)
 
     class Meta:
+        # Человекочитаемое имя
         verbose_name = 'ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
+    # Отображение при обращении к объекту
     def __str__(self):
         return self.title
 
@@ -81,9 +86,11 @@ class RecipeIngredient(models.Model):
         constraints = (
             models.UniqueConstraint(fields=('recipe', 'ingredient'), name='RecipeIngridient'),
         )
+        # Человекочитаемое имя
         verbose_name = 'ингредиент рецепта'
         verbose_name_plural = 'Ингредиенты рецептов'
 
+    # Отображение при обращении к объекту
     def __str__(self):
         return self.recipe.__str__() + ': ' + self.ingredient.__str__() + ' (' + self.ingredient.unit + ') ' + ' -- ' + str(self.quantity)
 
@@ -102,9 +109,11 @@ class Follow(models.Model):
         constraints = (
             models.UniqueConstraint(fields=('author', 'user'), name='AuthorUser'),
         )
+        # Человекочитаемое имя
         verbose_name = 'автор -- подписчик '
         verbose_name_plural = 'Подписки'
 
+    # Отображение при обращении к объекту
     def __str__(self):
         return self.author.__str__() + ' -- ' + self.user.__str__()
 
@@ -115,6 +124,7 @@ class Favourites(BaseModel):
     '''
 
     class Meta:
+        # Человекочитаемое имя
         verbose_name = 'избранное'
         verbose_name_plural = 'Избранное'
 
@@ -125,5 +135,6 @@ class SoppingList(BaseModel):
     '''
 
     class Meta:
+        # Человекочитаемое имя
         verbose_name = 'список покупок'
         verbose_name_plural = 'Списки покупок'
