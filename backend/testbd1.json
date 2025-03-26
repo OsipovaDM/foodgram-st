@@ -583,126 +583,126 @@
         "model": "cooking.follow",
         "fields": {
             "author": 1,
-            "user": 2
+            "follower": 2
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 1,
-            "user": 3
+            "follower": 3
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 1,
-            "user": 4
+            "follower": 4
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 1,
-            "user": 5
+            "follower": 5
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 2,
-            "user": 3
+            "follower": 3
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 2,
-            "user": 4
+            "follower": 4
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 2,
-            "user": 5
+            "follower": 5
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 3,
-            "user": 1
+            "follower": 1
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 3,
-            "user": 2
+            "follower": 2
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 4,
-            "user": 1
+            "follower": 1
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 4,
-            "user": 2
+            "follower": 2
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 5,
-            "user": 1
+            "follower": 1
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 5,
-            "user": 3
+            "follower": 3
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 6,
-            "user": 2
+            "follower": 2
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 7,
-            "user": 3
+            "follower": 3
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 8,
-            "user": 4
+            "follower": 4
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 9,
-            "user": 5
+            "follower": 5
         }
     },
     {
         "model": "cooking.follow",
         "fields": {
             "author": 10,
-            "user": 1
+            "follower": 1
         }
     },
     {
@@ -1045,7 +1045,7 @@
         "model": "users.user",
         "fields": {
             "username": "admin",
-            "password": "admin",
+            "password": "pbkdf2_sha256$600000$yzQKjWIN3HnicE4QvxqfGw$3p6Z5ZRxnXQXYRa3lAiNjmzRvhBS00jglctOl0skTiI=",
             "is_superuser": "True"
         }
     }

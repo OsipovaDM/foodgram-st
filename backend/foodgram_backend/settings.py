@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',  # API
     'users.apps.UsersConfig',  # Переопределение пользователя
     'rest_framework',  # Фреймворк DRF https://www.cdrf.co/#version-3.14
+    'django_filters',  # Фильтрация https://django-filter.readthedocs.io/en/stable/guide/usage.html
     'djoser',  # JWT-аутентификация
 ]
 
@@ -111,14 +112,18 @@ AUTH_USER_MODEL = 'users.User'  # Переопределенная модель 
 # https://djoser.readthedocs.io/en/latest/getting_started.html#available-endpoints
 REST_FRAMEWORK = {
     # Запрет действий анонимных пользователей
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 
     # JWT-аутентификация
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+
+    # Пагинация
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
 }
 
 

@@ -24,44 +24,42 @@ class CustomUserSerializer(UserSerializer):
     '''
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name')
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'avatar',)
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     '''
     Сериализатор модели Recipe
     '''
+    description = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Recipe.objects.all())]
+    )
+
     class Meta:
         model = Recipe
         fields = ('author', 'title', 'picture', 'description', 'cooking_time',)
         read_only = ('', )
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Recipe.objects.all(),
-                fields=('author', 'title')
-            ),
-            UniqueValidator(
-                queryset=Recipe.objects.all(),
-                fields=('description')
-            )
-        ]
+        validators = [UniqueTogetherValidator(
+            queryset=Recipe.objects.all(),
+            fields=('author', 'title')
+        )]
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     '''
     Сериализатор модели Ingredient
     '''
+    title = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Ingredient.objects.all())]
+    )
+
     class Meta:
         model = Ingredient
         fields = ('title', 'unit',)
         read_only = ('', )
-        validators = [UniqueValidator(
-            queryset=Ingredient.objects.all(),
-            fields=('title')
-        )]
 
 
-class Сomposition(serializers.ModelSerializer):
+class СompositionSerialiser(serializers.ModelSerializer):
     '''
     Сериализатор модели Сomposition
     '''

@@ -20,16 +20,16 @@ class Recipe(models.Model):
         'Время приготовления', help_text='В минутах')
     ingredients = models.ManyToManyField(
         to="Ingredient", through="Сomposition", related_name="recipes",)
-    # choosers = models.ManyToManyField(
-    #     to="User",
-    #     through="Favourites",
-    #     related_name="preferred",
-    # )
-    # buyers = models.ManyToManyField(
-    #     to="User",
-    #     through="ShoppingList",
-    #     related_name="recipes",
-    # )
+    choosers = models.ManyToManyField(
+        to="users.User",
+        through="Favourites",
+        related_name="preferred",
+    )
+    buyers = models.ManyToManyField(
+        to="users.User",
+        through="ShoppingList",
+        related_name="purchases",
+    )
 
     class Meta:
         constraints = (
@@ -50,9 +50,9 @@ class BaseModel(models.Model):
     Добавляет к модели связь с рецептом и пользователем
     '''
     recipe = models.ForeignKey(
-        Recipe, verbose_name='Рецепт', on_delete=models.CASCADE)
+        Recipe, verbose_name='Рецепт', on_delete=models.CASCADE, related_name='+')
     user = models.ForeignKey(
-        User, verbose_name='Пользователь', on_delete=models.CASCADE)
+        User, verbose_name='Пользователь', on_delete=models.CASCADE, related_name='+')
 
     class Meta:
         constraints = (
@@ -115,13 +115,13 @@ class Follow(models.Model):
     '''
     author = models.ForeignKey(
         User, verbose_name='Автор', on_delete=models.CASCADE, related_name='authors')
-    user = models.ForeignKey(
-        User, verbose_name='Подписчик', on_delete=models.CASCADE, related_name='users')
+    follower = models.ForeignKey(
+        User, verbose_name='Подписчик', on_delete=models.CASCADE, related_name='followers')
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=('author', 'user'), name='AuthorUser'),
-            models.CheckConstraint(check=~models.Q(author=models.F('user')), name='author_not_user'),
+            models.UniqueConstraint(fields=('author', 'follower'), name='AuthorFollower'),
+            models.CheckConstraint(check=~models.Q(author=models.F('follower')), name='author_not_follower'),
         )
         # Человекочитаемое имя
         verbose_name = 'автор -- подписчик '

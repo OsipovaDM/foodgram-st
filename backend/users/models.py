@@ -3,6 +3,9 @@ from django.db import models
 
 
 class User(AbstractUser):
+    '''
+    Кастомная модель Пользователя
+    '''
     avatar = models.ImageField(
         'avatar', upload_to='avatars/', null=True, blank=True)
 

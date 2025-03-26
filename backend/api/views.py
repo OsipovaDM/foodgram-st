@@ -1,12 +1,13 @@
 # from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from cooking.models import (
     Recipe, Ingredient, Сomposition,
     User, Follow, Favourites, ShoppingList)
 from .serializers import (
-    RecipeSerializer, IngredientSerializer, СompositionSerializer,
-    UserSerializer, FollowSerializer, FavouritesSerializer,
+    RecipeSerializer, IngredientSerializer, СompositionSerialiser,
+    CustomUserSerializer, FollowSerializer, FavouritesSerializer,
     ShoppingListSerializer)
 
 
@@ -14,8 +15,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
     '''
     Все операции CRUD с моделью Рецепт
     '''
-    queryset = Recipe.objects.all()  # Список элементов для представления
+    # pagination_class = LimitOffsetPagination
     serializer_class = RecipeSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        recipes = Recipe.objects.all()
+
+        if self.request.query_params.get('is_favorited') == 1:
+            recipes = recipes.filter(choosers=user)
+
+        if self.request.query_params.get('is_in_shopping_cart') == 1:
+            recipes = recipes.filter(buyers=user)
+
+        if 'author' in self.request.query_params:
+            recipes = recipes.filter(author=user)
+
+        return recipes
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -31,7 +47,7 @@ class СompositionViewSet(viewsets.ModelViewSet):
     Все операции CRUD с моделью Состав
     '''
     queryset = Сomposition.objects.all()  # Список элементов для представления
-    serializer_class = СompositionSerializer
+    serializer_class = СompositionSerialiser
 
 
 class FollowViewSet(viewsets.ModelViewSet):
@@ -63,4 +79,4 @@ class UserViewSet(viewsets.ModelViewSet):
     Все операции CRUD с моделью Рецепт
     '''
     queryset = User.objects.all()  # Список элементов для представления
-    serializer_class = UserSerializer
+    serializer_class = CustomUserSerializer

@@ -1,8 +1,15 @@
 from django.urls import include, path
+from rest_framework.routers import SimpleRouter
+
+from .views import (RecipeViewSet,)
+
+router = SimpleRouter()
+router.register('recipes', RecipeViewSet, basename='recipes')
 
 urlpatterns = [
     path('', include('djoser.urls')),  # Управление пользователями Django
     path('auth/', include('djoser.urls.jwt')),  # Управление JWT-токенами
+    path('', include(router.urls)),  # Добавление эндпоинтов, сформированных роутером
 ]
 
 # Available endpoints
