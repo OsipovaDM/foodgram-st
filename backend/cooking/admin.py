@@ -18,20 +18,20 @@ class RecipeAdmin(admin.ModelAdmin):
     '''
     # Поля карточки объекта
     fields = (
-        'author', 'title', 'picture', 'description',
+        'author', 'name', 'image', 'text',
         'cooking_time', 'favourites_count',)
     # Недоступные для редактирования поля
     readonly_fields = ('favourites_count',)
     # Поля страницы списка объектов
-    list_display = ('author', 'title',)
+    list_display = ('author', 'name',)
     # Разрешение редактирование полей на странице списка объектов
     list_editable = ()
     # Разрешение поиска по полям
-    search_fields = ('author', 'title',)
+    search_fields = ('author', 'name',)
     # Разрешение фильтрации по полям
     list_filter = ()
     # Переход к редактированию при клике на поле
-    list_display_links = ('title',)
+    list_display_links = ('name',)
     # Установка заначения вместо пустых
     empty_value_display = 'Не задано'
 

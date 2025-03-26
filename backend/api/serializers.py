@@ -1,5 +1,5 @@
 from djoser.serializers import UserSerializer
-from rest_framework import serializers
+from rest_framework import serializers  # https://www.django-rest-framework.org/api-guide/serializers/
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from cooking.models import (
@@ -24,25 +24,7 @@ class CustomUserSerializer(UserSerializer):
     '''
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'avatar',)
-
-
-class RecipeSerializer(serializers.ModelSerializer):
-    '''
-    Сериализатор модели Recipe
-    '''
-    description = serializers.SlugField(
-        validators=[UniqueValidator(queryset=Recipe.objects.all())]
-    )
-
-    class Meta:
-        model = Recipe
-        fields = ('author', 'title', 'picture', 'description', 'cooking_time',)
-        read_only = ('', )
-        validators = [UniqueTogetherValidator(
-            queryset=Recipe.objects.all(),
-            fields=('author', 'title')
-        )]
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'avatar',)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -57,6 +39,40 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = ('title', 'unit',)
         read_only = ('', )
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    '''
+    Сериализатор модели Recipe
+    '''
+    author = CustomUserSerializer()
+    ingredients = IngredientSerializer(many=True)
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
+    text = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Recipe.objects.all())]
+    )
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'author', 'ingredients', 'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
+        read_only = ('is_favorited', 'is_in_shopping_cart')
+        validators = [UniqueTogetherValidator(
+            queryset=Recipe.objects.all(),
+            fields=('author', 'title')
+        )]
+
+    def get_is_favorited(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.choosers.get(id=user).exists()
+        return False
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.buyers.get(id=user).exists()
+        return False
 
 
 class СompositionSerialiser(serializers.ModelSerializer):

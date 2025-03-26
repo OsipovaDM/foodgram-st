@@ -111,11 +111,6 @@ AUTH_USER_MODEL = 'users.User'  # Переопределенная модель 
 # JWT authentication
 # https://djoser.readthedocs.io/en/latest/getting_started.html#available-endpoints
 REST_FRAMEWORK = {
-    # Запрет действий анонимных пользователей
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-
     # JWT-аутентификация
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',

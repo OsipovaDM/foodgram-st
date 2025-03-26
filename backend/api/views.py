@@ -9,23 +9,25 @@ from .serializers import (
     RecipeSerializer, IngredientSerializer, СompositionSerialiser,
     CustomUserSerializer, FollowSerializer, FavouritesSerializer,
     ShoppingListSerializer)
+from .pagination import CatsPagination
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     '''
     Все операции CRUD с моделью Рецепт
     '''
-    # pagination_class = LimitOffsetPagination
+    # pagination_class = CatsPagination
     serializer_class = RecipeSerializer
 
     def get_queryset(self):
         user = self.request.user
+        if user.is_anonymous:
+            user = -1
         recipes = Recipe.objects.all()
-
-        if self.request.query_params.get('is_favorited') == 1:
+        if self.request.query_params.get('is_favorited') == "1":
             recipes = recipes.filter(choosers=user)
 
-        if self.request.query_params.get('is_in_shopping_cart') == 1:
+        if self.request.query_params.get('is_in_shopping_cart') == "1":
             recipes = recipes.filter(buyers=user)
 
         if 'author' in self.request.query_params:

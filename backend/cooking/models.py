@@ -10,11 +10,11 @@ class Recipe(models.Model):
     '''
     author = models.ForeignKey(
         User, verbose_name='Автор', on_delete=models.CASCADE, related_name='recipes')
-    title = models.CharField(
+    name = models.CharField(
         'Название', max_length=50)
-    picture = models.ImageField(
+    image = models.ImageField(
         'Картинка', upload_to='pictures/', null=True, blank=True)
-    description = models.TextField(
+    text = models.TextField(
         'Текстовое описание', unique=True)
     cooking_time = models.PositiveIntegerField(
         'Время приготовления', help_text='В минутах')
@@ -33,7 +33,7 @@ class Recipe(models.Model):
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=('author', 'title'), name='AuthorTitle'),
+            models.UniqueConstraint(fields=('author', 'name'), name='RecipeUK'),
         )
         # Человекочитаемое имя
         verbose_name = 'рецепт'
