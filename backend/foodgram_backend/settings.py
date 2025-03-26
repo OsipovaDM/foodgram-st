@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cooking.apps.CookingConfig',  # Базы данных
     'api.apps.ApiConfig',  # API
-    'rest_framework',  # Фреймворк DRF
+    'users.apps.UsersConfig',  # Переопределение пользователя
+    'rest_framework',  # Фреймворк DRF https://www.cdrf.co/#version-3.14
     'djoser',  # JWT-аутентификация
 ]
 
@@ -104,14 +105,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.User'  # Переопределенная модель пользователя
 
 # JWT authentication
 # https://djoser.readthedocs.io/en/latest/getting_started.html#available-endpoints
 REST_FRAMEWORK = {
     # Запрет действий анонимных пользователей
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 
     # JWT-аутентификация
     'DEFAULT_AUTHENTICATION_CLASSES': [

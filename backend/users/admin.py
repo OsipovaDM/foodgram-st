@@ -1,0 +1,22 @@
+from django.contrib import admin
+
+from .models import User
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    '''
+    Класс описания настроек админ-зоны для модели Пользователь
+    '''
+    # Поля страницы списка объектов
+    list_display = ('username', 'email',)
+    # Разрешение редактирование полей на странице списка объектов
+    list_editable = ()
+    # Разрешение поиска по полям
+    search_fields = ('username', 'email',)
+    # Разрешение фильтрации по полям
+    list_filter = ()
+    # Переход к редактированию при клике на поле
+    list_display_links = ()
+    # Установка заначения вместо пустых
+    empty_value_display = 'Не задано'

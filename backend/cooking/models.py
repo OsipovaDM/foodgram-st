@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model  # Модель пользователя
 from django.db import models  # Основная модель
 
-User = get_user_model()  # Получаем модель пользователя
+from users.models import User
 
 
 class Recipe(models.Model):
@@ -16,7 +16,20 @@ class Recipe(models.Model):
         'Картинка', upload_to='pictures/', null=True, blank=True)
     description = models.TextField(
         'Текстовое описание', unique=True)
-    cooking_time = models.DurationField('Время приготовления', help_text='В минутах')
+    cooking_time = models.PositiveIntegerField(
+        'Время приготовления', help_text='В минутах')
+    ingredients = models.ManyToManyField(
+        to="Ingredient", through="Сomposition", related_name="recipes",)
+    # choosers = models.ManyToManyField(
+    #     to="User",
+    #     through="Favourites",
+    #     related_name="preferred",
+    # )
+    # buyers = models.ManyToManyField(
+    #     to="User",
+    #     through="ShoppingList",
+    #     related_name="recipes",
+    # )
 
     class Meta:
         constraints = (
@@ -71,7 +84,7 @@ class Ingredient(models.Model):
         return self.title
 
 
-class RecipeIngredient(models.Model):
+class Сomposition(models.Model):
     '''
     Модель связывает рецепты и ингредиенты
     '''
@@ -79,7 +92,7 @@ class RecipeIngredient(models.Model):
         Recipe, verbose_name='Рецепт', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(
         Ingredient, verbose_name='Ингредиент', on_delete=models.CASCADE)
-    quantity = models.FloatField(
+    quantity = models.PositiveIntegerField(
         'Количество')
 
     class Meta:
@@ -87,8 +100,8 @@ class RecipeIngredient(models.Model):
             models.UniqueConstraint(fields=('recipe', 'ingredient'), name='RecipeIngridient'),
         )
         # Человекочитаемое имя
-        verbose_name = 'ингредиент рецепта'
-        verbose_name_plural = 'Ингредиенты рецептов'
+        verbose_name = 'состав'
+        verbose_name_plural = 'Составы'
 
     # Отображение при обращении к объекту
     def __str__(self):
@@ -108,6 +121,7 @@ class Follow(models.Model):
     class Meta:
         constraints = (
             models.UniqueConstraint(fields=('author', 'user'), name='AuthorUser'),
+            models.CheckConstraint(check=~models.Q(author=models.F('user')), name='author_not_user'),
         )
         # Человекочитаемое имя
         verbose_name = 'автор -- подписчик '
@@ -129,7 +143,7 @@ class Favourites(BaseModel):
         verbose_name_plural = 'Избранное'
 
 
-class SoppingList(BaseModel):
+class ShoppingList(BaseModel):
     '''
     Модель связывает пользователей и рецепты, добавленные в список покупок
     '''

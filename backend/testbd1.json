@@ -1,69 +1,69 @@
 [
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user1",
             "password": "password1"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user2",
             "password": "password2"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user3",
             "password": "password3"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user4",
             "password": "password4"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user5",
             "password": "password5"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user6",
             "password": "password6"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user7",
             "password": "password7"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user8",
             "password": "password8"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user9",
             "password": "password9"
         }
     },
     {
-        "model": "auth.user",
+        "model": "users.user",
         "fields": {
             "username": "user10",
             "password": "password10"
@@ -340,7 +340,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 1,
             "ingredient": 1,
@@ -348,7 +348,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 1,
             "ingredient": 2,
@@ -356,7 +356,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 2,
             "ingredient": 3,
@@ -364,7 +364,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 2,
             "ingredient": 4,
@@ -372,7 +372,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 3,
             "ingredient": 5,
@@ -380,7 +380,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 3,
             "ingredient": 6,
@@ -388,7 +388,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 4,
             "ingredient": 7,
@@ -396,7 +396,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 4,
             "ingredient": 8,
@@ -404,7 +404,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 5,
             "ingredient": 9,
@@ -412,7 +412,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 5,
             "ingredient": 10,
@@ -420,7 +420,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 6,
             "ingredient": 11,
@@ -428,7 +428,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 6,
             "ingredient": 12,
@@ -436,7 +436,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 7,
             "ingredient": 13,
@@ -444,7 +444,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 7,
             "ingredient": 14,
@@ -452,7 +452,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 8,
             "ingredient": 15,
@@ -460,7 +460,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 8,
             "ingredient": 16,
@@ -468,7 +468,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 9,
             "ingredient": 1,
@@ -476,7 +476,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 9,
             "ingredient": 5,
@@ -484,7 +484,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 10,
             "ingredient": 3,
@@ -492,7 +492,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 10,
             "ingredient": 18,
@@ -500,7 +500,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 11,
             "ingredient": 1,
@@ -508,7 +508,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 11,
             "ingredient": 10,
@@ -516,7 +516,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 12,
             "ingredient": 1,
@@ -524,7 +524,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 12,
             "ingredient": 2,
@@ -532,7 +532,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 13,
             "ingredient": 3,
@@ -540,7 +540,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 13,
             "ingredient": 4,
@@ -548,7 +548,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 14,
             "ingredient": 5,
@@ -556,7 +556,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 14,
             "ingredient": 6,
@@ -564,7 +564,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 15,
             "ingredient": 7,
@@ -572,7 +572,7 @@
         }
     },
     {
-        "model": "cooking.recipeingredient",
+        "model": "cooking.Сomposition",
         "fields": {
             "recipe": 15,
             "ingredient": 8,
@@ -846,199 +846,207 @@
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 1,
             "user": 1
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 2,
             "user": 1
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 3,
             "user": 1
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 4,
             "user": 2
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 5,
             "user": 2
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 6,
             "user": 2
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 7,
             "user": 2
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 8,
             "user": 3
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 9,
             "user": 3
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 10,
             "user": 3
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 11,
             "user": 4
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 12,
             "user": 4
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 13,
             "user": 5
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 14,
             "user": 5
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 15,
             "user": 5
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 1,
             "user": 6
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 2,
             "user": 6
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 3,
             "user": 6
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 4,
             "user": 7
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 5,
             "user": 7
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 6,
             "user": 7
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 7,
             "user": 8
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 8,
             "user": 8
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 9,
             "user": 9
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 10,
             "user": 9
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 11,
             "user": 10
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 12,
             "user": 10
         }
     },
     {
-        "model": "cooking.soppinglist",
+        "model": "cooking.shoppinglist",
         "fields": {
             "recipe": 13,
             "user": 1
+        }
+    },
+    {
+        "model": "users.user",
+        "fields": {
+            "username": "admin",
+            "password": "admin",
+            "is_superuser": "True"
         }
     }
 ]
