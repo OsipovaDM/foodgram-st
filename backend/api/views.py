@@ -16,7 +16,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     '''
     Все операции CRUD с моделью Рецепт
     '''
-    # pagination_class = CatsPagination
+    pagination_class = CatsPagination
     serializer_class = RecipeSerializer
 
     def get_queryset(self):

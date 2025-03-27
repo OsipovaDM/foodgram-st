@@ -8,7 +8,7 @@ router.register('recipes', RecipeViewSet, basename='recipes')
 
 urlpatterns = [
     path('', include('djoser.urls')),  # Управление пользователями Django
-    path('auth/', include('djoser.urls.jwt')),  # Управление JWT-токенами
+    path('auth/', include('djoser.urls.authtoken')), # 
     path('', include(router.urls)),  # Добавление эндпоинтов, сформированных роутером
 ]
 

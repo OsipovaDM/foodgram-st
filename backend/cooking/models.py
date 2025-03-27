@@ -69,9 +69,9 @@ class Ingredient(models.Model):
     '''
     Модель для хранения информации об ингредиентах
     '''
-    title = models.CharField(
+    name = models.CharField(
         'Название', max_length=50, unique=True)
-    unit = models.CharField(
+    measurement_unit = models.CharField(
         'Единица измерения', max_length=50)
 
     class Meta:
@@ -81,7 +81,7 @@ class Ingredient(models.Model):
 
     # Отображение при обращении к объекту
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Сomposition(models.Model):
@@ -89,10 +89,10 @@ class Сomposition(models.Model):
     Модель связывает рецепты и ингредиенты
     '''
     recipe = models.ForeignKey(
-        Recipe, verbose_name='Рецепт', on_delete=models.CASCADE)
+        Recipe, verbose_name='Рецепт', on_delete=models.CASCADE, related_name='component')
     ingredient = models.ForeignKey(
         Ingredient, verbose_name='Ингредиент', on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(
+    amount = models.PositiveIntegerField(
         'Количество')
 
     class Meta:

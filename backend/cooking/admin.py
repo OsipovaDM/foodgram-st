@@ -46,11 +46,11 @@ class IngredientAdmin(admin.ModelAdmin):
     Класс описания настроек админ-зоны для модели Ингредиент
     '''
     # Поля страницы списка объектов
-    list_display = ('title', 'unit')
+    list_display = ('name', 'measurement_unit')
     # Разрешение редактирование полей на странице списка объектов
     list_editable = ()
     # Разрешение поиска по полям
-    search_fields = ('title',)
+    search_fields = ('name',)
     # Разрешение фильтрации по полям
     list_filter = ()
     # Переход к редактированию при клике на поле

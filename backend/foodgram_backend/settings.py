@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',  # API
     'users.apps.UsersConfig',  # Переопределение пользователя
     'rest_framework',  # Фреймворк DRF https://www.cdrf.co/#version-3.14
+    'rest_framework.authtoken', # 
     'django_filters',  # Фильтрация https://django-filter.readthedocs.io/en/stable/guide/usage.html
     'djoser',  # JWT-аутентификация
 ]
@@ -111,9 +114,9 @@ AUTH_USER_MODEL = 'users.User'  # Переопределенная модель 
 # JWT authentication
 # https://djoser.readthedocs.io/en/latest/getting_started.html#available-endpoints
 REST_FRAMEWORK = {
-    # JWT-аутентификация
+    # 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
 
     # Пагинация
@@ -128,6 +131,9 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+# 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
