@@ -119,8 +119,7 @@ class RecipeBriefSerializer(RecipeBaseSerialiser):
     '''
     Сериализатор модели Recipe
     '''
-    class Meta:
-        fields = ('id', 'author', 'ingredients', 'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
+    pass
 
 
 class RecipeDetailSerializer(RecipeBaseSerialiser):
@@ -161,6 +160,7 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
         print(validated_data)
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
+        #!!!Вынести в отдельную функцию
         for ingredient in ingredients:
             Composition.objects.create(recipe=recipe, ingredient_id=ingredient['id'], amount=ingredient['amount'])
         return recipe
@@ -183,6 +183,22 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
 
     def to_representation(self, instance):
         return RecipeDetailSerializer(instance, context=self.context).data
+
+
+# class ShotLinkSerialiser(serializers.ModelSerializer):
+#     '''
+#     Сериализатор получения короткой ссылки рецепта
+#     '''
+#     short_link = serializers.SerializerMethodField(label='short-link', read_only=True)
+
+#     class Meta:
+#         model = Recipe
+#         fields = ('short_link',)
+
+#     def get_short_link(self, obj):
+#         # HttpRequest.build_absolute_uri(location=None) Возвращает абсолютную форму URI location. Если местоположение не указано, оно будет установлено на request.get_full_path().
+#         request = self.context.get('request')
+#         return request.build_absolute_uri(f'/s/{obj.id}')
 
 
 class FollowSerializer(serializers.ModelSerializer):

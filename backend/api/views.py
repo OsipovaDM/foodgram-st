@@ -1,6 +1,9 @@
 # from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from cooking.models import (
     Recipe, Ingredient, Composition,
@@ -8,7 +11,7 @@ from cooking.models import (
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer, CompositionSerialiser,
     CustomUserSerializer, FollowSerializer, FavouritesSerializer,
-    ShoppingListSerializer, RecipeCreateUpdateSerializer)
+    ShoppingListSerializer, RecipeCreateUpdateSerializer, )
 from .pagination import CatsPagination
 
 
@@ -42,6 +45,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(
+        detail=True,  # Работа с одним объектом
+        methods=['get'],  # Разрешены только GET запросы
+        url_path='get-link'  # Ссылка для вызова метода
+    )
+    def get_link(self, request, pk=None):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        link = request.build_absolute_uri(f'/s/{recipe.id}')
+        return Response({"short-link": link})
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
