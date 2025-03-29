@@ -3,12 +3,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from cooking.models import (
-    Recipe, Ingredient, Сomposition,
+    Recipe, Ingredient, Composition,
     User, Follow, Favourites, ShoppingList)
 from .serializers import (
-    RecipeSerializer, IngredientSerializer, СompositionSerialiser,
+    RecipeDetailSerializer, IngredientSerializer, CompositionSerialiser,
     CustomUserSerializer, FollowSerializer, FavouritesSerializer,
-    ShoppingListSerializer)
+    ShoppingListSerializer, RecipeCreateUpdateSerializer)
 from .pagination import CatsPagination
 
 
@@ -17,13 +17,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
     Все операции CRUD с моделью Рецепт
     '''
     pagination_class = CatsPagination
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeDetailSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return RecipeCreateUpdateSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
+        recipes = Recipe.objects.all()
         user = self.request.user
         if user.is_anonymous:
             user = -1
-        recipes = Recipe.objects.all()
         if self.request.query_params.get('is_favorited') == "1":
             recipes = recipes.filter(choosers=user)
 
@@ -35,6 +40,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return recipes
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class IngredientViewSet(viewsets.ModelViewSet):
     '''
@@ -44,12 +52,12 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
 
 
-class СompositionViewSet(viewsets.ModelViewSet):
+class CompositionViewSet(viewsets.ModelViewSet):
     '''
     Все операции CRUD с моделью Состав
     '''
-    queryset = Сomposition.objects.all()  # Список элементов для представления
-    serializer_class = СompositionSerialiser
+    queryset = Composition.objects.all()  # Список элементов для представления
+    serializer_class = CompositionSerialiser
 
 
 class FollowViewSet(viewsets.ModelViewSet):

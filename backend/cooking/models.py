@@ -19,7 +19,7 @@ class Recipe(models.Model):
     cooking_time = models.PositiveIntegerField(
         'Время приготовления', help_text='В минутах')
     ingredients = models.ManyToManyField(
-        to="Ingredient", through="Сomposition", related_name="recipes",)
+        to="Ingredient", through="Composition", related_name="recipes",)
     choosers = models.ManyToManyField(
         to="users.User",
         through="Favourites",
@@ -84,7 +84,7 @@ class Ingredient(models.Model):
         return self.name
 
 
-class Сomposition(models.Model):
+class Composition(models.Model):
     '''
     Модель связывает рецепты и ингредиенты
     '''

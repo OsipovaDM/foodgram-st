@@ -6,7 +6,7 @@ from rest_framework import serializers  # https://www.django-rest-framework.org/
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from cooking.models import (
-    Recipe, Ingredient, Сomposition,
+    Recipe, Ingredient, Composition,
     User, Follow, Favourites, ShoppingList)
 
 
@@ -61,22 +61,18 @@ class IngredientSerializer(serializers.ModelSerializer):
         read_only = ('', )
 
 
-class СompositionSerialiser(serializers.ModelSerializer):
+class CompositionSerialiser(serializers.ModelSerializer):
     '''
-    Сериализатор модели Сomposition
+    Сериализатор модели Composition
     '''
     id = serializers.IntegerField(source='ingredient.id')
-    name = serializers.CharField(source='ingredient.name')
-    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+    name = serializers.CharField(source='ingredient.name', required=False)
+    measurement_unit = serializers.CharField(source='ingredient.measurement_unit', required=False)
 
     class Meta:
-        model = Сomposition
+        model = Composition
         fields = ('id', 'name', 'measurement_unit', 'amount',)
-        read_only = ('', )
-        validators = [UniqueTogetherValidator(
-            queryset=Сomposition.objects.all(),
-            fields=('recipe', 'ingredient')
-        )]
+        read_only = ('name', )
 
     # Проверка на положительность количества ингридиентов в рецепте
     def validate_amount(self, amount):
@@ -86,41 +82,96 @@ class СompositionSerialiser(serializers.ModelSerializer):
         return amount
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeBaseSerialiser(serializers.ModelSerializer):
     '''
-    Сериализатор модели Recipe
+    Абстрактный сериализатор полей recipe
     '''
-    author = CustomUserSerializer()
-    image = Base64ImageField(required=False, allow_null=True)
-    ingredients = СompositionSerialiser(source='component', many=True)
-    is_in_shopping_cart = serializers.SerializerMethodField()
-    is_favorited = serializers.SerializerMethodField()
-    text = serializers.SlugField(
-        validators=[UniqueValidator(queryset=Recipe.objects.all())]
-    )
+    author = CustomUserSerializer(read_only=True, default=serializers.CurrentUserDefault())
+    image = serializers.SerializerMethodField(read_only=True)
+    ingredients = CompositionSerialiser(source='component', many=True)
+    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
         fields = ('id', 'author', 'ingredients', 'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
-        read_only = ('is_favorited', 'is_in_shopping_cart')
-        validators = [UniqueTogetherValidator(
-            queryset=Recipe.objects.all(),
-            fields=('author', 'title')
-        )]
+        abstract = True
+
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            if obj.choosers.filter(id=user.id).exists():
-                return True
+            return obj.choosers.filter(id=user.id).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            if obj.buyers.filter(id=user.id).exists():
-                return True
+            return obj.buyers.filter(id=user.id).exists()
         return False
+
+
+class RecipeBriefSerializer(RecipeBaseSerialiser):
+    '''
+    Сериализатор модели Recipe
+    '''
+    class Meta:
+        fields = ('id', 'author', 'ingredients', 'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
+
+
+class RecipeDetailSerializer(RecipeBaseSerialiser):
+    '''
+    Сериализатор модели Recipe
+    '''
+    pass
+
+
+class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
+    '''
+    Сериализатор модели Recipe
+    '''
+    ingredients = serializers.JSONField()
+    image = Base64ImageField(required=False, allow_null=True)
+
+    def validate_ingredients(self, value):
+        print(value)
+        if not value:
+            raise serializers.ValidationError(
+                'Ingredients list cannot be empty'
+            )
+        ingredients = []
+        for item in value:
+            ingredient_id = item.get('id')
+            amount = item.get('amount')
+            if not ingredient_id or not amount:
+                raise serializers.ValidationError(
+                    'Each ingredient must have id and amount'
+                )
+            if int(amount) < 1:
+                raise serializers.ValidationError(
+                    'Amount must be at least 1'
+                )
+            ingredients.append(item)
+        print(ingredients)
+        return ingredients
+
+    def create(self, validated_data):
+        print(validated_data)
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient in ingredients:
+            Composition.objects.create(recipe=recipe, ingredient_id=ingredient['id'], amount=ingredient['amount'])
+        return recipe
+
+    def to_representation(self, instance):
+        return RecipeDetailSerializer(
+            instance,
+            context=self.context
+        ).data
 
 
 class FollowSerializer(serializers.ModelSerializer):

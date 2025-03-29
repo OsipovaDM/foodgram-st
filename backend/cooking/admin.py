@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from .models import (
-    Recipe, Ingredient, Сomposition,
+    Recipe, Ingredient, Composition,
     Follow, Favourites, ShoppingList)
 
-admin.site.register(Сomposition)
+admin.site.register(Composition)
 admin.site.register(Follow)
 admin.site.register(Favourites)
 admin.site.register(ShoppingList)
