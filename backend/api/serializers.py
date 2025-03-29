@@ -138,7 +138,6 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
     image = Base64ImageField(required=False, allow_null=True)
 
     def validate_ingredients(self, value):
-        print(value)
         if not value:
             raise serializers.ValidationError(
                 'Ingredients list cannot be empty'
@@ -156,7 +155,6 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
                     'Amount must be at least 1'
                 )
             ingredients.append(item)
-        print(ingredients)
         return ingredients
 
     def create(self, validated_data):
@@ -167,11 +165,24 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
             Composition.objects.create(recipe=recipe, ingredient_id=ingredient['id'], amount=ingredient['amount'])
         return recipe
 
+    def update(self, instance, validated_data):
+        ingredients_data = validated_data.pop('ingredients', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)  # instance.attr = value
+
+        if ingredients_data is not None:
+            instance.component.all().delete()
+            lst = []
+            for ingredient in ingredients_data:
+                Composition.objects.create(recipe=instance, ingredient_id=ingredient['id'], amount=ingredient['amount'])
+            instance.ingredients.set(lst)
+
+        instance.save()
+        return instance
+
     def to_representation(self, instance):
-        return RecipeDetailSerializer(
-            instance,
-            context=self.context
-        ).data
+        return RecipeDetailSerializer(instance, context=self.context).data
 
 
 class FollowSerializer(serializers.ModelSerializer):
