@@ -52,13 +52,10 @@ class IngredientSerializer(serializers.ModelSerializer):
     '''
     Сериализатор модели Ingredient
     '''
-    name = serializers.SlugField(
-        validators=[UniqueValidator(queryset=Ingredient.objects.all())]
-    )
 
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit',)
+        fields = ('id', 'name', 'measurement_unit',)
 
 
 class CompositionSerialiser(serializers.ModelSerializer):
@@ -199,26 +196,3 @@ class FollowSerializer(serializers.ModelSerializer):
             queryset=Follow.objects.all(),
             fields=('author', 'user')
         )]
-
-
-class FavouritesSerializer(BaseSerialiser):
-    '''
-    Сериализатор модели Favourites
-    '''
-    class Meta:
-        model = Favourites
-        read_only = ('', )
-        validators = [UniqueTogetherValidator(
-            queryset=Favourites.objects.all(),
-            fields=('recipe', 'user')
-        )]
-
-
-class ShoppingListSerializer(BaseSerialiser):
-    '''
-    Сериализатор модели ShoppingList
-    '''
-    class Meta:
-        model = ShoppingList
-        fields = ('recipe', 'user')
-        read_only = ('', )

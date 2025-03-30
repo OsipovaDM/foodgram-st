@@ -11,8 +11,8 @@ from cooking.models import (
     User, Follow, Favourites, ShoppingList)
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer, CompositionSerialiser,
-    CustomUserSerializer, FollowSerializer, FavouritesSerializer,
-    ShoppingListSerializer, RecipeCreateUpdateSerializer, RecipeBriefSerializer,)
+    CustomUserSerializer, FollowSerializer,
+    RecipeCreateUpdateSerializer, RecipeBriefSerializer,)
 from .pagination import CatsPagination
 
 
@@ -136,24 +136,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
-class ShoppingListViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     '''
-    Операции POST и DELETE с моделью Список покупок
-    '''
-    queryset = Recipe.objects.all()  # Список элементов для представления
-    serializer_class = ShoppingListSerializer
-
-    # def perform_create(self, serializer, recipe_id):
-    #     user = self.request.user
-    #     recipe = Recipe.objects.get_object_or_404(pk=recipe_id)
-    #     ShoppingList.objects.create(recipe=recipe, user=user)
-    #     serializer.save()
-
-
-class IngredientViewSet(viewsets.ModelViewSet):
-    '''
-    Все операции CRUD с моделью Ингредиент
+    Только GET методы с моделью Ингредиент
     '''
     queryset = Ingredient.objects.all()  # Список элементов для представления
     serializer_class = IngredientSerializer
@@ -173,14 +158,6 @@ class FollowViewSet(viewsets.ModelViewSet):
     '''
     queryset = Follow.objects.all()  # Список элементов для представления
     serializer_class = FollowSerializer
-
-
-class FavouritesViewSet(viewsets.ModelViewSet):
-    '''
-    Все операции CRUD с моделью Избранное
-    '''
-    queryset = Favourites.objects.all()  # Список элементов для представления
-    serializer_class = FavouritesSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
