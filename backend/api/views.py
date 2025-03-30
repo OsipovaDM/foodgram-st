@@ -1,4 +1,5 @@
 # from django.shortcuts import render
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import  mixins, viewsets, status
 from rest_framework.generics import get_object_or_404
@@ -79,6 +80,37 @@ class RecipeViewSet(viewsets.ModelViewSet):
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(
+        detail=False,  # Работа с полным набором объектов
+        methods=['get'],  # Разрешены только GET запросы
+    )
+    def download_shopping_cart(self, request):
+        user = request.user
+        shop_list = {}
+
+        for recipe in user.purchases.all():
+            for component in recipe.component.all():
+                name = component.ingredient.name
+                amount = component.amount
+                measurement_unit = component.ingredient.measurement_unit
+
+                if name in shop_list:
+                    shop_list[name]['amount'] += amount
+                else:
+                    shop_list[name] = {
+                        'amount': amount,
+                        'measurement_unit': measurement_unit
+                    }
+        
+        # Форматируем список в текстовый вид
+        text_content = "Список покупок:\n\n"
+        for ingredient, data in shop_list.items():
+            text_content += f"{ingredient}: {data['amount']} ({data['measurement_unit']})\n"
+
+        # Создаём файловый ответ
+        response = HttpResponse(text_content, content_type='text/plain; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
+        return response
 
 
 class ShoppingListViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
