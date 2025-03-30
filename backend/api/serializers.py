@@ -3,6 +3,7 @@ import base64  #
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers  # https://www.django-rest-framework.org/api-guide/serializers/
+from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from cooking.models import (
@@ -58,7 +59,6 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ('name', 'measurement_unit',)
-        read_only = ('', )
 
 
 class CompositionSerialiser(serializers.ModelSerializer):
@@ -72,7 +72,7 @@ class CompositionSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Composition
         fields = ('id', 'name', 'measurement_unit', 'amount',)
-        read_only = ('name', )
+        read_only_fields = ('name', )
 
     # Проверка на положительность количества ингридиентов в рецепте
     def validate_amount(self, amount):
@@ -119,7 +119,10 @@ class RecipeBriefSerializer(RecipeBaseSerialiser):
     '''
     Сериализатор модели Recipe
     '''
-    pass
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time',)
+        read_only_fields = ('name', 'image', 'cooking_time',)
 
 
 class RecipeDetailSerializer(RecipeBaseSerialiser):
@@ -157,7 +160,6 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
         return ingredients
 
     def create(self, validated_data):
-        print(validated_data)
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         #!!!Вынести в отдельную функцию
@@ -183,22 +185,6 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
 
     def to_representation(self, instance):
         return RecipeDetailSerializer(instance, context=self.context).data
-
-
-# class ShotLinkSerialiser(serializers.ModelSerializer):
-#     '''
-#     Сериализатор получения короткой ссылки рецепта
-#     '''
-#     short_link = serializers.SerializerMethodField(label='short-link', read_only=True)
-
-#     class Meta:
-#         model = Recipe
-#         fields = ('short_link',)
-
-#     def get_short_link(self, obj):
-#         # HttpRequest.build_absolute_uri(location=None) Возвращает абсолютную форму URI location. Если местоположение не указано, оно будет установлено на request.get_full_path().
-#         request = self.context.get('request')
-#         return request.build_absolute_uri(f'/s/{obj.id}')
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -234,8 +220,5 @@ class ShoppingListSerializer(BaseSerialiser):
     '''
     class Meta:
         model = ShoppingList
+        fields = ('recipe', 'user')
         read_only = ('', )
-        validators = [UniqueTogetherValidator(
-            queryset=Favourites.objects.all(),
-            fields=('recipe', 'user')
-        )]

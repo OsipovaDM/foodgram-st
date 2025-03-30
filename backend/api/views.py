@@ -1,6 +1,6 @@
 # from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import  mixins, viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,7 +11,7 @@ from cooking.models import (
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer, CompositionSerialiser,
     CustomUserSerializer, FollowSerializer, FavouritesSerializer,
-    ShoppingListSerializer, RecipeCreateUpdateSerializer, )
+    ShoppingListSerializer, RecipeCreateUpdateSerializer, RecipeBriefSerializer,)
 from .pagination import CatsPagination
 
 
@@ -56,6 +56,44 @@ class RecipeViewSet(viewsets.ModelViewSet):
         link = request.build_absolute_uri(f'/s/{recipe.id}')
         return Response({"short-link": link})
 
+    @action(
+        detail=False,  # Работа с полным набором объектов
+        methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
+        url_path=r'(?P<recipe_id>\d+)/shopping_cart'
+    )
+    def shopping_cart(self, request, recipe_id=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        serializer = RecipeBriefSerializer(recipe)
+        item = ShoppingList.objects.filter(recipe=recipe, user=user).first()
+
+        if request.method == 'POST':
+            if item is None:
+                ShoppingList.objects.create(recipe=recipe, user=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'Рецепт уже есть в списке покупок.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if item is None:
+            return Response({'detail': 'Рецепт отсутствует в списке покупок.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class ShoppingListViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    '''
+    Операции POST и DELETE с моделью Список покупок
+    '''
+    queryset = Recipe.objects.all()  # Список элементов для представления
+    serializer_class = ShoppingListSerializer
+
+    # def perform_create(self, serializer, recipe_id):
+    #     user = self.request.user
+    #     recipe = Recipe.objects.get_object_or_404(pk=recipe_id)
+    #     ShoppingList.objects.create(recipe=recipe, user=user)
+    #     serializer.save()
+
 
 class IngredientViewSet(viewsets.ModelViewSet):
     '''
@@ -87,14 +125,6 @@ class FavouritesViewSet(viewsets.ModelViewSet):
     '''
     queryset = Favourites.objects.all()  # Список элементов для представления
     serializer_class = FavouritesSerializer
-
-
-class ShoppingListViewSet(viewsets.ModelViewSet):
-    '''
-    Все операции CRUD с моделью Список покупок
-    '''
-    queryset = ShoppingList.objects.all()  # Список элементов для представления
-    serializer_class = ShoppingListSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

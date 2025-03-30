@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken', # 
     'django_filters',  # Фильтрация https://django-filter.readthedocs.io/en/stable/guide/usage.html
     'djoser',  # JWT-аутентификация
+    'drf_spectacular'  # Динамическая спецификация
 ]
 
 MIDDLEWARE = [
@@ -122,6 +123,9 @@ REST_FRAMEWORK = {
     # Пагинация
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
+
+    # Динамическая спецификация
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
