@@ -134,19 +134,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CustomSearchFilter(filters.SearchFilter):
-    search_param = "name"
-
-
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     '''
     Только GET методы с моделью Ингредиент
     '''
     queryset = Ingredient.objects.all()  # Список элементов для представления
     serializer_class = IngredientSerializer
-    filter_backends = (CustomSearchFilter,)
-    search_fields = ('name',)
-    # SEARCH_PARAM = 'name' Переопределить только глобально в settings
+
+    def get_queryset(self):
+        queryset = Ingredient.objects.all()
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
 
 
 class CompositionViewSet(viewsets.ModelViewSet):
