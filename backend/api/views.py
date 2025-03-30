@@ -1,7 +1,5 @@
-# from django.shortcuts import render
 from django.http import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import  mixins, viewsets, status
+from rest_framework import  filters, viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -136,12 +134,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class CustomSearchFilter(filters.SearchFilter):
+    search_param = "name"
+
+
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     '''
     Только GET методы с моделью Ингредиент
     '''
     queryset = Ingredient.objects.all()  # Список элементов для представления
     serializer_class = IngredientSerializer
+    filter_backends = (CustomSearchFilter,)
+    search_fields = ('name',)
+    # SEARCH_PARAM = 'name' Переопределить только глобально в settings
 
 
 class CompositionViewSet(viewsets.ModelViewSet):

@@ -2,10 +2,11 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import SimpleRouter
 
-from .views import (RecipeViewSet,)
+from .views import (RecipeViewSet, IngredientViewSet)
 
 router = SimpleRouter()
 router.register(r'recipes', RecipeViewSet, basename='recipes')
+router.register(r'ingredients', IngredientViewSet, basename='ingredients')
 
 urlpatterns = [
     path('', include('djoser.urls')),  # Управление пользователями Django
