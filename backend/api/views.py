@@ -112,6 +112,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
         return response
 
+    @action(
+        detail=False,  # Работа с полным набором объектов
+        methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
+        url_path=r'(?P<recipe_id>\d+)/favorite'
+    )
+    def favorite(self, request, recipe_id=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        serializer = RecipeBriefSerializer(recipe)
+        item = Favourites.objects.filter(recipe=recipe, user=user).first()
+
+        if request.method == 'POST':
+            if item is None:
+                Favourites.objects.create(recipe=recipe, user=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'Рецепт уже в избранном.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if item is None:
+            return Response({'detail': 'Рецепт отсутствует в избранном.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 class ShoppingListViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     '''
