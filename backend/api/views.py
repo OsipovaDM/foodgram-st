@@ -5,10 +5,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from cooking.models import (
-    Recipe, Ingredient, Composition,
+    Recipe, Ingredient,
     User, Follow, Favourites, ShoppingList)
 from .serializers import (
-    RecipeDetailSerializer, IngredientSerializer, CompositionSerialiser,
+    RecipeDetailSerializer, IngredientSerializer,
     CustomUserSerializer, FollowSerializer,
     RecipeCreateUpdateSerializer, RecipeBriefSerializer,)
 from .pagination import CatsPagination
@@ -115,7 +115,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
         url_path=r'(?P<recipe_id>\d+)/favorite'
     )
-    def favorite(self, request, recipe_id=None):
+    def favorite(self, request, recipe_id=None):  #!!!Скорее всего можно как-то объединить с добавлением в список покупок
         user = request.user
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         serializer = RecipeBriefSerializer(recipe)
@@ -147,14 +147,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
         if name is not None:
             queryset = queryset.filter(name__icontains=name)
         return queryset
-
-
-class CompositionViewSet(viewsets.ModelViewSet):
-    '''
-    Все операции CRUD с моделью Состав
-    '''
-    queryset = Composition.objects.all()  # Список элементов для представления
-    serializer_class = CompositionSerialiser
 
 
 class FollowViewSet(viewsets.ModelViewSet):
