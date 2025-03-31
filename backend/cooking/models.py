@@ -114,9 +114,9 @@ class Follow(models.Model):
     с авторами рецептов, на которых они подписаны
     '''
     author = models.ForeignKey(
-        User, verbose_name='Автор', on_delete=models.CASCADE, related_name='authors')
+        User, verbose_name='Автор', on_delete=models.CASCADE, related_name='followers')
     follower = models.ForeignKey(
-        User, verbose_name='Подписчик', on_delete=models.CASCADE, related_name='followers')
+        User, verbose_name='Подписчик', on_delete=models.CASCADE, related_name='authors')
 
     class Meta:
         constraints = (

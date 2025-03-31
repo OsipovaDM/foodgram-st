@@ -43,9 +43,24 @@ class CustomUserSerializer(UserSerializer):
     '''
     Переопределен набор полей сериализатора для Пользователя
     '''
+    avatar = serializers.SerializerMethodField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField(read_only=True)  # Подписан ли текущий пользователь на этого
+
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'avatar',)
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'avatar',)
+
+    def get_avatar(self, obj):
+        if obj.avatar:
+            return obj.avatar.url
+        return None
+
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            is_subscribed = obj.authors.filter(author=user).exists()
+            return is_subscribed
+        return False
 
 
 class IngredientSerializer(serializers.ModelSerializer):

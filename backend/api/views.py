@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import  filters, viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
@@ -157,9 +158,14 @@ class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class CustomUserViewSet(DjoserUserViewSet):
     '''
     Все операции CRUD с моделью Рецепт
     '''
-    queryset = User.objects.all()  # Список элементов для представления
+    # queryset = User.objects.all()  # Список элементов для представления
+    pagination_class = CatsPagination
     serializer_class = CustomUserSerializer
+
+    # def list(self, request, *args, **kwargs):
+    #     serializer = CustomUserSerializer(self.queryset)
+    #     return super().list(request, *args, **kwargs)

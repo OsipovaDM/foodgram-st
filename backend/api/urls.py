@@ -2,14 +2,15 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import SimpleRouter
 
-from .views import (RecipeViewSet, IngredientViewSet)
+from .views import (RecipeViewSet, IngredientViewSet, CustomUserViewSet)
 
 router = SimpleRouter()
 router.register(r'recipes', RecipeViewSet, basename='recipes')
 router.register(r'ingredients', IngredientViewSet, basename='ingredients')
+router.register(r'users', CustomUserViewSet, basename='ingredusersients')
 
 urlpatterns = [
-    path('', include('djoser.urls')),  # Управление пользователями Django
+    # path('', include('djoser.urls')),  # Управление пользователями Django
     path('auth/', include('djoser.urls.authtoken')), # 
     path('', include(router.urls)),  # Добавление эндпоинтов, сформированных роутером
     path('schema/', SpectacularAPIView.as_view(), name='schema'),  # Динамическая спецификация
