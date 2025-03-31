@@ -162,7 +162,6 @@ class CustomUserViewSet(DjoserUserViewSet):
     '''
     Все операции CRUD с моделью Рецепт
     '''
-    # queryset = User.objects.all()  # Список элементов для представления
     pagination_class = CatsPagination
     serializer_class = CustomUserSerializer
 
@@ -170,3 +169,9 @@ class CustomUserViewSet(DjoserUserViewSet):
         if self.action == 'create':
             return CustomUserCreateSerializer
         return CustomUserSerializer
+    
+    def list(self, request):
+        queryset = User.objects.all()
+        context = self.get_serializer_context()
+        serializer = CustomUserSerializer(queryset, context=context, many=True)
+        return Response(serializer.data)
