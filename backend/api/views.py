@@ -176,10 +176,17 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(['put'], False, r'me/avatar')
-    def avatar(self, request):
+    @action(['put', 'delete'], False, r'me/avatar')
+    def avatar(self, request): #!!!Очень похожую штуку делала в Рецептах
         user = request.user
-        serializer = AvatarSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"avatar": user.avatar.url})
+        if request.method == 'PUT':
+            serializer = AvatarSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"avatar": user.avatar.url})
+
+        if user.avatar:
+            user.avatar.delete()
+            request.user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'detail': 'Аватар отсутствует в профиле.'}, status=status.HTTP_400_BAD_REQUEST)
