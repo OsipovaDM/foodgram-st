@@ -47,7 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(
-        detail=True,  # Работа с одним объектом
+        detail=True,
         methods=['get'],  # Разрешены только GET запросы
         url_path='get-link'  # Ссылка для вызова метода
     )
@@ -57,7 +57,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response({"short-link": link})
 
     @action(
-        detail=False,  # Работа с полным набором объектов
+        detail=False,
         methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
         url_path=r'(?P<recipe_id>\d+)/shopping_cart'
     )
@@ -80,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        detail=False,  # Работа с полным набором объектов
+        detail=False,
         methods=['get'],  # Разрешены только GET запросы
     )
     def download_shopping_cart(self, request):
@@ -112,7 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
     @action(
-        detail=False,  # Работа с полным набором объектов
+        detail=False,
         methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
         url_path=r'(?P<recipe_id>\d+)/favorite'
     )
@@ -158,10 +158,11 @@ class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
 
 
-class CustomUserViewSet(UserViewSet):
+class CustomUserViewSet(viewsets.ModelViewSet):
     '''
     Все операции CRUD с моделью Рецепт
     '''
+    queryset = User.objects.all()
     pagination_class = CatsPagination
     serializer_class = CustomUserSerializer
 
@@ -170,13 +171,8 @@ class CustomUserViewSet(UserViewSet):
             return CustomUserCreateSerializer
         return CustomUserSerializer
 
-    def list(self, request):
-        queryset = User.objects.all()
-        context = self.get_serializer_context()
-        serializer = CustomUserSerializer(queryset, context=context, many=True)
+    @action(['get'], detail=False)
+    def me(self, request):
+        serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    def retrieve(self, request, id=None):
-        instance = get_object_or_404(User, pk=id)
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
