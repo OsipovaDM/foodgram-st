@@ -11,7 +11,7 @@ from cooking.models import (
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer,
     CustomUserSerializer, FollowSerializer,
-    RecipeCreateUpdateSerializer, RecipeBriefSerializer, CustomUserCreateSerializer,)
+    RecipeCreateUpdateSerializer, RecipeBriefSerializer, CustomUserCreateSerializer, AvatarSerializer,)
 from .pagination import CatsPagination
 
 
@@ -171,8 +171,15 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return CustomUserCreateSerializer
         return CustomUserSerializer
 
-    @action(['get'], detail=False)
+    @action(['get'], False)
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
+    @action(['put'], False, r'me/avatar')
+    def avatar(self, request):
+        user = request.user
+        serializer = AvatarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"avatar": user.avatar.url})

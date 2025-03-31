@@ -67,6 +67,15 @@ class CustomUserCreateSerializer(CustomUserSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name',)
 
 
+class AvatarSerializer(UserSerializer):
+    '''
+    
+    '''
+    class Meta:
+        model = User
+        fields = ('avatar',)
+
+
 class IngredientSerializer(serializers.ModelSerializer):
     '''
     Сериализатор модели Ingredient
