@@ -11,7 +11,7 @@ from cooking.models import (
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer,
     CustomUserSerializer, FollowSerializer,
-    RecipeCreateUpdateSerializer, RecipeBriefSerializer,)
+    RecipeCreateUpdateSerializer, RecipeBriefSerializer, CustomUserCreateSerializer,)
 from .pagination import CatsPagination
 
 
@@ -166,6 +166,7 @@ class CustomUserViewSet(DjoserUserViewSet):
     pagination_class = CatsPagination
     serializer_class = CustomUserSerializer
 
-    # def list(self, request, *args, **kwargs):
-    #     serializer = CustomUserSerializer(self.queryset)
-    #     return super().list(request, *args, **kwargs)
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CustomUserCreateSerializer
+        return CustomUserSerializer

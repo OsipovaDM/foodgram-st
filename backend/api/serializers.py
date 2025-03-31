@@ -37,8 +37,6 @@ class BaseSerialiser(serializers.ModelSerializer):
         abstract = True
 
 
-# Не знаю, насколько мне это понадобится
-# Возможно, придется добавлять сюда поля is_subscribed, avatar
 class CustomUserSerializer(UserSerializer):
     '''
     Переопределен набор полей сериализатора для Пользователя
@@ -61,6 +59,12 @@ class CustomUserSerializer(UserSerializer):
             is_subscribed = obj.authors.filter(author=user).exists()
             return is_subscribed
         return False
+
+
+class CustomUserCreateSerializer(CustomUserSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
