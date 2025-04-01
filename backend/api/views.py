@@ -11,7 +11,7 @@ from cooking.models import (
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer,
     CustomUserSerializer, FollowSerializer,
-    RecipeCreateUpdateSerializer, RecipeBriefSerializer, CustomUserCreateSerializer, AvatarSerializer,)
+    RecipeCreateUpdateSerializer, RecipeBriefSerializer, CustomUserCreateSerializer, AvatarSerializer, PasswordSerializer,)
 from .pagination import CatsPagination
 
 
@@ -190,3 +190,12 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             request.user.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({'detail': 'Аватар отсутствует в профиле.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(['post'], False)
+    def set_password(self, request): #!!!Опять очень типичная структура
+        context = self.get_serializer_context()
+        serializer = PasswordSerializer(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+        request.user.set_password(serializer.validated_data['new_password'])
+        request.user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

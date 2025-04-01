@@ -1,5 +1,7 @@
 import base64  # 
 
+from django.contrib.auth import password_validation
+from django.contrib.auth.hashers import check_password
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers  # https://www.django-rest-framework.org/api-guide/serializers/
@@ -67,13 +69,45 @@ class CustomUserCreateSerializer(CustomUserSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name',)
 
 
-class AvatarSerializer(UserSerializer):
+class AvatarSerializer(serializers.ModelSerializer):
     '''
     
     '''
+    avatar = Base64ImageField(required=False, allow_null=True)
+
     class Meta:
         model = User
         fields = ('avatar',)
+
+
+class PasswordSerializer(serializers.ModelSerializer):
+    '''
+    
+    '''
+    new_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}
+    )
+    current_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}
+    )
+
+    class Meta:
+        model = User
+        fields = ('new_password', 'current_password')
+
+    def validate_current_password(self, value):
+        user = self.context['request'].user
+        if not check_password(value, user.password):
+            raise serializers.ValidationError("Текущий пароль неверный")
+        return value
+
+    def validate_new_password(self, value):
+        password_validation.validate_password(value, self.context['request'].user)
+        return value
 
 
 class IngredientSerializer(serializers.ModelSerializer):
