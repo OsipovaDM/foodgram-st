@@ -246,15 +246,16 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
         return RecipeDetailSerializer(instance, context=self.context).data
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowSerializer(CustomUserSerializer):
     '''
-    Сериализатор модели Follow
+    
     '''
+    recipes = RecipeBriefSerializer(read_only=True, many=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
-        model = Follow
-        fields = ('author', 'user',)
-        read_only = ('', )
-        validators = [UniqueTogetherValidator(
-            queryset=Follow.objects.all(),
-            fields=('author', 'user')
-        )]
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count', 'avatar')
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.all().count()

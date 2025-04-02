@@ -150,14 +150,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-class FollowViewSet(viewsets.ModelViewSet):
-    '''
-    Все операции CRUD с моделью Подписка
-    '''
-    queryset = Follow.objects.all()  # Список элементов для представления
-    serializer_class = FollowSerializer
-
-
 class CustomUserViewSet(viewsets.ModelViewSet):
     '''
     Все операции CRUD с моделью Рецепт
@@ -199,3 +191,33 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         request.user.set_password(serializer.validated_data['new_password'])
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(['get'], False)
+    def subscriptions(self, request, *args, **kwargs):
+        user = request.user
+        authors = User.objects.filter(followers__follower=user)
+        context = self.get_serializer_context()
+        serializer = FollowSerializer(authors, many=True, context=context)
+        return Response(serializer.data)
+
+    @action(['post', 'delete'], True)
+    def subscribe(self, request, pk=None, *args, **kwargs): # явно можно объединить с другими методами
+        # параметры obj, User, FollowSerializer, Follow...filter(author=dep, follower=obj) и create(...)
+        obj = request.user
+        dep = get_object_or_404(User, pk=pk) # dep от слова dependence
+        context = self.get_serializer_context()
+        serializer = FollowSerializer(dep, context=context)
+        item = Follow.objects.filter(author=dep, follower=obj).first()
+
+        if request.method == 'POST':
+            if item is None:
+                Follow.objects.create(author=dep, follower=obj)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'Вы уже подписаны на данного автора.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if item is None:
+            return Response({'detail': 'Вы не подписаны на данного автора.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
