@@ -6,8 +6,12 @@ class User(AbstractUser):
     '''
     Кастомная модель Пользователя
     '''
+    email = models.EmailField('email address', unique=True)
     avatar = models.ImageField(
         'avatar', upload_to='avatars/', null=True, blank=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         # Человекочитаемое имя
@@ -17,3 +21,5 @@ class User(AbstractUser):
     # Отображение при обращении к объекту
     def __str__(self):
         return self.username
+
+

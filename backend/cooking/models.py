@@ -103,10 +103,6 @@ class Composition(models.Model):
         verbose_name = 'состав'
         verbose_name_plural = 'Составы'
 
-    # Отображение при обращении к объекту
-    def __str__(self):
-        return self.recipe.__str__() + ': ' + self.ingredient.__str__() + ' (' + self.ingredient.unit + ') ' + ' -- ' + str(self.quantity)
-
 
 class Follow(models.Model):
     '''
@@ -126,10 +122,6 @@ class Follow(models.Model):
         # Человекочитаемое имя
         verbose_name = 'автор -- подписчик '
         verbose_name_plural = 'Подписки'
-
-    # Отображение при обращении к объекту
-    def __str__(self):
-        return self.author.__str__() + ' -- ' + self.user.__str__()
 
 
 class Favourites(BaseModel):

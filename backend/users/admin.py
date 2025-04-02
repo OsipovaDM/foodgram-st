@@ -9,7 +9,7 @@ class UserAdmin(admin.ModelAdmin):
     Класс описания настроек админ-зоны для модели Пользователь
     '''
     # Поля отображаемые в карточке объекта
-    fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'avatar',)
+    fields = ('email', 'id', 'username', 'first_name', 'last_name', 'avatar',)
     # Поля страницы списка объектов
     list_display = ('username', 'email',)
     # Разрешение редактирование полей на странице списка объектов

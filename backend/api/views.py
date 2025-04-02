@@ -1,6 +1,5 @@
 from django.http import HttpResponse
-from djoser.views import UserViewSet
-from rest_framework import  filters, viewsets, status
+from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,7 +10,7 @@ from cooking.models import (
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer,
     CustomUserSerializer, FollowSerializer,
-    RecipeCreateUpdateSerializer, RecipeBriefSerializer, CustomUserCreateSerializer, AvatarSerializer, PasswordSerializer,)
+    RecipeCreateUpdateSerializer, RecipeBriefSerializer, AvatarSerializer, PasswordSerializer,)
 from .pagination import CatsPagination
 
 
@@ -220,4 +219,3 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
