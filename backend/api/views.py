@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from rest_framework import viewsets, status
+from rest_framework import mixins, viewsets, status, permissions
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,13 +12,14 @@ from .serializers import (
     CustomUserSerializer, FollowSerializer,
     RecipeCreateUpdateSerializer, RecipeBriefSerializer, AvatarSerializer, PasswordSerializer, CustomUserCreateSerializer)
 from .pagination import CatsPagination
+from .permissions import AuthorOrReadOnly
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     '''
-    Все операции CRUD с моделью Рецепт
+
     '''
-    pagination_class = CatsPagination
+    permission_classes = [AuthorOrReadOnly,]
     serializer_class = RecipeDetailSerializer
 
     def get_serializer_class(self):
@@ -45,24 +46,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(
-        detail=True,
-        methods=['get'],  # Разрешены только GET запросы
-        url_path='get-link'  # Ссылка для вызова метода
-    )
+    @action(['get'], True, url_path='get-link')
     def get_link(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         link = request.build_absolute_uri(f'/s/{recipe.id}')
         return Response({"short-link": link})
 
-    @action(
-        detail=False,
-        methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
-        url_path=r'(?P<recipe_id>\d+)/shopping_cart'
-    )
-    def shopping_cart(self, request, recipe_id=None):
+    @action(['post', 'delete'], True)
+    def shopping_cart(self, request, pk=None):
         user = request.user
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        recipe = get_object_or_404(Recipe, pk=pk)
         serializer = RecipeBriefSerializer(recipe)
         item = ShoppingList.objects.filter(recipe=recipe, user=user).first()
 
@@ -78,10 +71,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(
-        detail=False,
-        methods=['get'],  # Разрешены только GET запросы
-    )
+    @action(['get'], False, permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         user = request.user
         shop_list = {}
@@ -110,14 +100,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
         return response
 
-    @action(
-        detail=False,
-        methods=['post', 'delete'],  # Разрешены только POST, DELETE запросы
-        url_path=r'(?P<recipe_id>\d+)/favorite'
-    )
-    def favorite(self, request, recipe_id=None):  #!!!Скорее всего можно как-то объединить с добавлением в список покупок
+    @action(['post', 'delete'], True)
+    def favorite(self, request, pk=None):  #!!!Скорее всего можно как-то объединить с добавлением в список покупок
         user = request.user
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        recipe = get_object_or_404(Recipe, pk=pk)
         serializer = RecipeBriefSerializer(recipe)
         item = Favourites.objects.filter(recipe=recipe, user=user).first()
 
@@ -149,12 +135,14 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-class CustomUserViewSet(viewsets.ModelViewSet):
+class CustomUserViewSet(mixins.CreateModelMixin,
+                        mixins.RetrieveModelMixin,
+                        mixins.ListModelMixin,
+                        viewsets.GenericViewSet):
     '''
-    Все операции CRUD с моделью Рецепт
+
     '''
     queryset = User.objects.all()
-    pagination_class = CatsPagination
     serializer_class = CustomUserSerializer
 
     def get_serializer_class(self):
@@ -162,12 +150,12 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return CustomUserCreateSerializer
         return CustomUserSerializer
 
-    @action(['get'], False)
+    @action(['get'], False, permission_classes=[permissions.IsAuthenticated,])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(['put', 'delete'], False, r'me/avatar')
+    @action(['put', 'delete'], False, r'me/avatar', permission_classes=[permissions.IsAuthenticated,])
     def avatar(self, request): #!!!Очень похожую штуку делала в Рецептах
         user = request.user
         if request.method == 'PUT':
@@ -182,7 +170,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({'detail': 'Аватар отсутствует в профиле.'}, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(['post'], False)
+    @action(['post'], False, permission_classes=[permissions.IsAuthenticated,])
     def set_password(self, request): #!!!Опять очень типичная структура
         context = self.get_serializer_context()
         serializer = PasswordSerializer(data=request.data, context=context)
@@ -191,7 +179,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(['get'], False)
+    @action(['get'], False, permission_classes=[permissions.IsAuthenticated,])
     def subscriptions(self, request, *args, **kwargs):
         user = request.user
         authors = User.objects.filter(followers__follower=user)
@@ -199,7 +187,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         serializer = FollowSerializer(authors, many=True, context=context)
         return Response(serializer.data)
 
-    @action(['post', 'delete'], True)
+    @action(['post', 'delete'], True, permission_classes=[permissions.IsAuthenticated,])
     def subscribe(self, request, pk=None, *args, **kwargs): # явно можно объединить с другими методами
         # параметры obj, User, FollowSerializer, Follow...filter(author=dep, follower=obj) и create(...)
         obj = request.user

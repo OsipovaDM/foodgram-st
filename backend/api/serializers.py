@@ -2,6 +2,7 @@ import base64  #
 
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers  # https://www.django-rest-framework.org/api-guide/serializers/
@@ -43,6 +44,10 @@ class CustomUserSerializer(UserSerializer):
     '''
     Переопределен набор полей сериализатора для Пользователя
     '''
+    email = serializers.EmailField(required=True, max_length=254, validators=[UniqueValidator(queryset=User.objects.all())])
+    username = serializers.CharField(required=True, max_length=150, validators=[UniqueValidator(queryset=User.objects.all()), UnicodeUsernameValidator(),])
+    first_name = serializers.CharField(required=True, max_length=150,)
+    last_name = serializers.CharField(required=True, max_length=150,)
     avatar = serializers.SerializerMethodField(read_only=True)
     is_subscribed = serializers.SerializerMethodField(read_only=True)  # Подписан ли текущий пользователь на этого
 
@@ -64,15 +69,15 @@ class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserCreateSerializer(CustomUserSerializer):
-    email = serializers.EmailField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
-    username = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=True)
+    '''
+    
+    '''
     password = serializers.CharField(required=True)
 
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = User.objects.create_user(

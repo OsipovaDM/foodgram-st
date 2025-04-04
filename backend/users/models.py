@@ -6,7 +6,7 @@ class User(AbstractUser):
     '''
     Кастомная модель Пользователя
     '''
-    email = models.EmailField('email address', unique=True)
+    email = models.EmailField('email address', unique=True, max_length=254)
     avatar = models.ImageField(
         'avatar', upload_to='avatars/', null=True, blank=True)
 
