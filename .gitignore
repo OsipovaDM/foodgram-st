@@ -142,3 +142,6 @@ static/
 media/
 
 notes.txt
+data/recipes.csv
+data/json to fixture.py
+data/fixtures recipe.py

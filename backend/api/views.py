@@ -3,6 +3,7 @@ from rest_framework import mixins, viewsets, status, permissions
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from cooking.models import (
     Recipe, Ingredient,
@@ -126,6 +127,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     '''
     queryset = Ingredient.objects.all()  # Список элементов для представления
     serializer_class = IngredientSerializer
+    pagination_class = None
 
     def get_queryset(self):
         queryset = Ingredient.objects.all()
@@ -159,7 +161,7 @@ class CustomUserViewSet(mixins.CreateModelMixin,
     def avatar(self, request): #!!!Очень похожую штуку делала в Рецептах
         user = request.user
         if request.method == 'PUT':
-            serializer = AvatarSerializer(data=request.data)
+            serializer = AvatarSerializer(instance=user, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({"avatar": user.avatar.url})
@@ -184,8 +186,11 @@ class CustomUserViewSet(mixins.CreateModelMixin,
         user = request.user
         authors = User.objects.filter(followers__follower=user)
         context = self.get_serializer_context()
-        serializer = FollowSerializer(authors, many=True, context=context)
-        return Response(serializer.data)
+
+        paginator = CatsPagination()
+        paginated_authors = paginator.paginate_queryset(authors, request)
+        serializer = FollowSerializer(paginated_authors, many=True, context=context)
+        return paginator.get_paginated_response(serializer.data)
 
     @action(['post', 'delete'], True, permission_classes=[permissions.IsAuthenticated,])
     def subscribe(self, request, pk=None, *args, **kwargs): # явно можно объединить с другими методами

@@ -6,6 +6,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers  # https://www.django-rest-framework.org/api-guide/serializers/
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
@@ -29,15 +30,6 @@ class Base64ImageField(serializers.ImageField):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
-
-
-class BaseSerialiser(serializers.ModelSerializer):
-    '''
-    Абстрактный сериализатор полей recipe, user
-    '''
-    class Meta:
-        fields = ('recipe', 'user')
-        abstract = True
 
 
 class CustomUserSerializer(UserSerializer):
@@ -72,12 +64,11 @@ class CustomUserCreateSerializer(CustomUserSerializer):
     '''
     
     '''
-    password = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
 
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -175,6 +166,7 @@ class RecipeBaseSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'author', 'ingredients', 'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',)
+        validators = [UniqueTogetherValidator(queryset=Recipe.objects.all(), fields=('author', 'name'))]
         abstract = True
 
     def get_image(self, obj):
@@ -244,7 +236,10 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
         recipe = Recipe.objects.create(**validated_data)
         #!!!Вынести в отдельную функцию
         for ingredient in ingredients:
-            Composition.objects.create(recipe=recipe, ingredient_id=ingredient['id'], amount=ingredient['amount'])
+            if Ingredient.objects.filter(id=ingredient['id']).exists():
+                Composition.objects.create(recipe=recipe, ingredient_id=ingredient['id'], amount=ingredient['amount'])
+            else:
+                raise serializers.ValidationError(detail=f"Ингредиент с индексом {ingredient['id']} не существует.")
         return recipe
 
     def update(self, instance, validated_data):
@@ -257,7 +252,10 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
             instance.component.all().delete()
             lst = []
             for ingredient in ingredients_data:
-                Composition.objects.create(recipe=instance, ingredient_id=ingredient['id'], amount=ingredient['amount'])
+                if Ingredient.objects.filter(id=ingredient['id']).exists():
+                    Composition.objects.create(recipe=instance, ingredient_id=ingredient['id'], amount=ingredient['amount'])
+                else:
+                    raise serializers.ValidationError(detail=f"Ингредиент с индексом {ingredient['id']} не существует.")
             instance.ingredients.set(lst)
 
         instance.save()

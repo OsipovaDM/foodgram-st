@@ -15,7 +15,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         'Картинка', upload_to='pictures/', null=True, blank=True)
     text = models.TextField(
-        'Текстовое описание', unique=True)
+        'Текстовое описание')
     cooking_time = models.PositiveIntegerField(
         'Время приготовления', help_text='В минутах')
     ingredients = models.ManyToManyField(
