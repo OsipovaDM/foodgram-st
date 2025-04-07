@@ -122,11 +122,8 @@
   - описать базовые представления / сериализаторы, запихать туда общие методы добычи данных (например self.context['request'].user)
   - Импорты модели пользователя делать через settings.AUTH_USER_MODEL и get_user_model()
 
-  - recipes post повторяющиеся ingredients  +
-  - patch recipe without ingredients  +
   - recipe limit 
-  - валидация самоподписки  +
 
-- 17 запусков коллекции осталось.
+- 15 запусков коллекции осталось.
 
 
