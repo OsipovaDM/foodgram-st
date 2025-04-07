@@ -207,12 +207,14 @@ class CustomUserViewSet(mixins.CreateModelMixin,
 
         if request.method == 'POST':
             if item is None:
+                if obj == dep:
+                    return Response({'author': 'Нельзя подписаться на самого себя.'}, status=status.HTTP_400_BAD_REQUEST)
                 Follow.objects.create(author=dep, follower=obj)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({'detail': 'Вы уже подписаны на данного автора.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'author': 'Вы уже подписаны на данного автора.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if item is None:
-            return Response({'detail': 'Вы не подписаны на данного автора.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'author': 'Вы не подписаны на данного автора.'}, status=status.HTTP_400_BAD_REQUEST)
         
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

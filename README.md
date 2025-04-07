@@ -122,16 +122,10 @@
   - описать базовые представления / сериализаторы, запихать туда общие методы добычи данных (например self.context['request'].user)
   - Импорты модели пользователя делать через settings.AUTH_USER_MODEL и get_user_model()
 
-  - limit get users  +
-  - put avatar blank  +
-  - ingredients filter начинается с ...  +
-  - recipes limit  +
-  - recipes post повторяющиеся ingredients
-  - post recipe without image 400  +
-  - validation cooking_time  +
-  - patch recipe without ingredients
+  - recipes post повторяющиеся ingredients  +
+  - patch recipe without ingredients  +
   - recipe limit 
-  - валидация самоподписки
+  - валидация самоподписки  +
 
 - 17 запусков коллекции осталось.
 

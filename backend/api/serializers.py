@@ -209,7 +209,7 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
     '''
     Сериализатор модели Recipe
     '''
-    ingredients = serializers.JSONField(required=True)
+    ingredients = serializers.JSONField()
     image = Base64ImageField()
     cooking_time = serializers.IntegerField(min_value=1)
 
@@ -219,6 +219,7 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
                 'Ingredients list cannot be empty'
             )
         ingredients = []
+        duplicate = set()
         for item in value:
             ingredient_id = item.get('id')
             amount = item.get('amount')
@@ -230,7 +231,12 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
                 raise serializers.ValidationError(
                     'Amount must be at least 1'
                 )
+            if ingredient_id in duplicate:
+                raise serializers.ValidationError(
+                    'Ingredients must be unique'
+                )
             ingredients.append(item)
+            duplicate.add(ingredient_id)
         return ingredients
 
     def create(self, validated_data):
@@ -259,6 +265,8 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
                 else:
                     raise serializers.ValidationError(detail=f"Ингредиент с индексом {ingredient['id']} не существует.")
             instance.ingredients.set(lst)
+        else:
+            raise serializers.ValidationError("поле \"ingredients\" обязательно")
 
         instance.save()
         return instance
@@ -277,6 +285,14 @@ class FollowSerializer(CustomUserSerializer):
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count', 'avatar')
+        validators = [UniqueTogetherValidator(queryset=Follow.objects.all(), fields=('author', 'follower'))]
+
+    def validate(self, attrs):
+        if self.context['request'].user == attrs['author']:
+            raise serializers.ValidationError(
+                {'author': 'Нельзя подписаться на самого себя'}
+            )
+        return super().validate(attrs)
 
     def get_recipes_count(self, obj):
         return obj.recipes.all().count()
