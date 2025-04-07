@@ -144,6 +144,7 @@ class CompositionSerialiser(serializers.ModelSerializer):
         model = Composition
         fields = ('id', 'name', 'measurement_unit', 'amount',)
         read_only_fields = ('name', )
+        validators = [UniqueTogetherValidator(queryset=Composition.objects.all(), fields=('recipe', 'ingredient'))]
 
     # Проверка на положительность количества ингридиентов в рецепте
     def validate_amount(self, amount):
@@ -208,8 +209,9 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
     '''
     Сериализатор модели Recipe
     '''
-    ingredients = serializers.JSONField()
-    image = Base64ImageField(required=False, allow_null=True)
+    ingredients = serializers.JSONField(required=True)
+    image = Base64ImageField()
+    cooking_time = serializers.IntegerField(min_value=1)
 
     def validate_ingredients(self, value):
         if not value:

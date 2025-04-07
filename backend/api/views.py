@@ -22,6 +22,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     '''
     permission_classes = [AuthorOrReadOnly,]
     serializer_class = RecipeDetailSerializer
+    pagination_class = CatsPagination
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -133,7 +134,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = Ingredient.objects.all()
         name = self.request.query_params.get('name')
         if name is not None:
-            queryset = queryset.filter(name__icontains=name)
+            queryset = queryset.filter(name__istartswith=name)
         return queryset
 
 
@@ -146,6 +147,7 @@ class CustomUserViewSet(mixins.CreateModelMixin,
     '''
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
+    pagination_class = CatsPagination
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -161,10 +163,12 @@ class CustomUserViewSet(mixins.CreateModelMixin,
     def avatar(self, request): #!!!Очень похожую штуку делала в Рецептах
         user = request.user
         if request.method == 'PUT':
-            serializer = AvatarSerializer(instance=user, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response({"avatar": user.avatar.url})
+            if request.data:
+                serializer = AvatarSerializer(instance=user, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response({"avatar": user.avatar.url})
+            return Response({'detail': 'Мало данных.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if user.avatar:
             user.avatar.delete()

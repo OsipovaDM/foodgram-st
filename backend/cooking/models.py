@@ -13,7 +13,7 @@ class Recipe(models.Model):
     name = models.CharField(
         'Название', max_length=50)
     image = models.ImageField(
-        'Картинка', upload_to='pictures/', null=True, blank=True)
+        'Картинка', upload_to='pictures/')
     text = models.TextField(
         'Текстовое описание')
     cooking_time = models.PositiveIntegerField(
