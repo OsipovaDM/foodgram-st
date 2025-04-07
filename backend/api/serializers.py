@@ -58,7 +58,7 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name', 
+            'email', 'id', 'username', 'first_name',
             'last_name', 'is_subscribed', 'avatar',
         )
 
@@ -83,7 +83,9 @@ class CustomUserCreateSerializer(CustomUserSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
+        fields = (
+            'email', 'id', 'username', 'first_name', 'last_name', 'password'
+        )
 
     def create(self, validated_data):
         """Создает нового пользователя с валидированными данными."""
@@ -146,7 +148,7 @@ class CompositionSerialiser(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name', required=False)
     measurement_unit = serializers.CharField(
-        source='ingredient.measurement_unit', 
+        source='ingredient.measurement_unit',
         required=False
     )
 
