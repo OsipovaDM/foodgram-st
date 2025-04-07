@@ -6,25 +6,23 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from cooking.models import (
-    Recipe, Ingredient, Composition,
-    User, Follow, Favourites, ShoppingList
+    Recipe, Ingredient, Composition, User, Follow
 )
 
 
 class Base64ImageField(serializers.ImageField):
     """Поле для работы с изображениями в формате base64."""
-    
+
     def to_internal_value(self, data):
         """
         Преобразует данные изображения из base64 в файл.
-        
+
         Args:
             data: Входные данные, может быть строкой base64 или файлом
-            
+
         Returns:
             ContentFile: Декодированное изображение в виде файла
         """
@@ -32,16 +30,16 @@ class Base64ImageField(serializers.ImageField):
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name=f'temp.{ext}')
-            
+
         return super().to_internal_value(data)
 
 
 class CustomUserSerializer(UserSerializer):
     """Сериализатор для модели пользователя с кастомными полями."""
-    
+
     email = serializers.EmailField(
-        required=True, 
-        max_length=254, 
+        required=True,
+        max_length=254,
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
     username = serializers.CharField(
@@ -80,7 +78,7 @@ class CustomUserSerializer(UserSerializer):
 
 class CustomUserCreateSerializer(CustomUserSerializer):
     """Сериализатор для создания пользователя с паролем."""
-    
+
     password = serializers.CharField(required=True, write_only=True)
 
     class Meta:
@@ -94,7 +92,7 @@ class CustomUserCreateSerializer(CustomUserSerializer):
 
 class AvatarSerializer(serializers.ModelSerializer):
     """Сериализатор для обновления аватара пользователя."""
-    
+
     avatar = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
@@ -104,7 +102,7 @@ class AvatarSerializer(serializers.ModelSerializer):
 
 class PasswordSerializer(serializers.ModelSerializer):
     """Сериализатор для изменения пароля пользователя."""
-    
+
     new_password = serializers.CharField(
         write_only=True,
         required=True,
@@ -129,13 +127,14 @@ class PasswordSerializer(serializers.ModelSerializer):
 
     def validate_new_password(self, value):
         """Валидирует новый пароль."""
-        password_validation.validate_password(value, self.context['request'].user)
+        user = self.context['request'].user
+        password_validation.validate_password(value, user)
         return value
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для модели ингредиента."""
-    
+
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
@@ -143,7 +142,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class CompositionSerialiser(serializers.ModelSerializer):
     """Сериализатор для состава рецепта (ингредиент + количество)."""
-    
+
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name', required=False)
     measurement_unit = serializers.CharField(
@@ -165,15 +164,17 @@ class CompositionSerialiser(serializers.ModelSerializer):
     def validate_amount(self, amount):
         """Проверяет, что количество ингредиента положительное."""
         if amount <= 0:
-            raise serializers.ValidationError('Количество должно быть положительно')
+            raise serializers.ValidationError(
+                'Количество должно быть положительно'
+            )
         return amount
 
 
 class RecipeBaseSerialiser(serializers.ModelSerializer):
     """Базовый сериализатор для рецептов с общими полями."""
-    
+
     author = CustomUserSerializer(
-        read_only=True, 
+        read_only=True,
         default=serializers.CurrentUserDefault()
     )
     image = serializers.SerializerMethodField(read_only=True)
@@ -184,7 +185,7 @@ class RecipeBaseSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'author', 'ingredients', 'is_favorited', 
+            'id', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',
         )
         validators = [
@@ -218,7 +219,7 @@ class RecipeBaseSerialiser(serializers.ModelSerializer):
 
 class RecipeBriefSerializer(RecipeBaseSerialiser):
     """Краткий сериализатор рецепта для списков."""
-    
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -232,7 +233,7 @@ class RecipeDetailSerializer(RecipeBaseSerialiser):
 
 class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
     """Сериализатор для создания и обновления рецептов."""
-    
+
     ingredients = serializers.JSONField()
     image = Base64ImageField()
     cooking_time = serializers.IntegerField(min_value=1)
@@ -240,31 +241,35 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
     def validate_ingredients(self, value):
         """Валидирует список ингредиентов."""
         if not value:
-            raise serializers.ValidationError('Ingredients list cannot be empty')
-            
+            raise serializers.ValidationError(
+                'Ingredients list cannot be empty'
+            )
+
         ingredients = []
         seen_ids = set()
-        
+
         for item in value:
             self._validate_ingredient_item(item, seen_ids)
             ingredients.append(item)
-            
+
         return ingredients
 
     def _validate_ingredient_item(self, item, seen_ids):
         """Валидирует отдельный элемент списка ингредиентов."""
         ingredient_id = item.get('id')
         amount = item.get('amount')
-        
+
         if not ingredient_id or not amount:
-            raise serializers.ValidationError('Each ingredient must have id and amount')
-            
+            raise serializers.ValidationError(
+                'Each ingredient must have id and amount'
+            )
+
         if int(amount) < 1:
             raise serializers.ValidationError('Amount must be at least 1')
-            
+
         if ingredient_id in seen_ids:
             raise serializers.ValidationError('Ingredients must be unique')
-            
+
         seen_ids.add(ingredient_id)
 
     def _process_ingredients(self, recipe, ingredients_data):
@@ -291,15 +296,15 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
         """Обновляет существующий рецепт."""
         if 'ingredients' not in validated_data:
             raise serializers.ValidationError('Поле "ingredients" обязательно')
-            
+
         ingredients_data = validated_data.pop('ingredients')
-        
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.component.all().delete()
         self._process_ingredients(instance, ingredients_data)
-        
+
         instance.save()
         return instance
 
@@ -310,15 +315,15 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
 
 class FollowSerializer(CustomUserSerializer):
     """Сериализатор для подписок с информацией о рецептах."""
-    
+
     recipes = RecipeBriefSerializer(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name', 
-            'last_name', 'is_subscribed', 'recipes', 
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed', 'recipes',
             'recipes_count', 'avatar'
         )
         validators = [
