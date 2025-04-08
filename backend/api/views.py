@@ -1,11 +1,13 @@
+from secrets import token_urlsafe
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from rest_framework import mixins, viewsets, status, permissions
 from rest_framework.generics import get_object_or_404
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 
 from cooking.models import (
-    Recipe, Ingredient, User, Follow, Favourites, ShoppingList
+    Recipe, Ingredient, User, Follow, Favourites, ShoppingList, ShortLink
 )
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer,
@@ -15,6 +17,15 @@ from .serializers import (
 )
 from .pagination import CatsPagination
 from .permissions import AuthorOrReadOnly
+
+
+@api_view(['GET'])
+def redirect_short_link(request, abridged):
+    try:
+        link = ShortLink.objects.get(abridged=abridged)
+        return redirect(link.origin)
+    except ShortLink.DoesNotExist:
+        return Response({"error": "Ссылка не найдена"}, status=404)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -58,7 +69,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_link(self, request, pk=None):
         """Генерирует короткую ссылку на рецепт."""
         recipe = get_object_or_404(Recipe, pk=pk)
-        link = request.build_absolute_uri(f'/s/{recipe.id}')
+        original_url = request.build_absolute_uri(recipe.get_absolute_url())
+        item = ShortLink.objects.filter(origin=original_url).first()
+        if item:
+            abridged = item.abridged
+        else:
+            abridged = token_urlsafe(6)[:6]
+            ShortLink.objects.create(
+                origin=original_url,
+                abridged=abridged
+            )
+        link = request.build_absolute_uri(f'/s/{abridged}')
         return Response({"short-link": link})
 
     def _handle_item_action(self, request, pk, model, serializer_class,

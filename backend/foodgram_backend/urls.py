@@ -19,10 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from api.views import redirect_short_link
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Подключение эндпоинтов приложения к корневому проекту
     path('api/', include('api.urls')),
+    path('s/<str:abridged>/', redirect_short_link, name='redirect-short-link'),
 ]
 
 if settings.DEBUG:

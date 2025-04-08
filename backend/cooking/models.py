@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model  # Модель пользователя
 from django.db import models  # Основная модель
+from django.urls import reverse
 
 from users.models import User
 
@@ -42,6 +43,10 @@ class Recipe(models.Model):
     # Отображение при обращении к объекту
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("recipes-detail", kwargs={"pk": self.pk})
+    
 
 
 class BaseModel(models.Model):
@@ -144,3 +149,18 @@ class ShoppingList(BaseModel):
         # Человекочитаемое имя
         verbose_name = 'список покупок'
         verbose_name_plural = 'Списки покупок'
+
+
+class ShortLink(models.Model):
+    """Описывает короткие ссылки на рецепты"""
+
+    origin = models.URLField('Исходная ссылка на рецепт ', max_length=200, unique=True)
+    abridged = models.CharField('Код рецепта', max_length=50, unique=True)
+
+    class Meta:
+        # Человекочитаемое имя
+        verbose_name = 'перенаправление ссылки'
+        verbose_name_plural = 'Перенаправление ссылок'
+
+    def __str__(self):
+        return f'{self.origin} <--> {self.abridged}'
