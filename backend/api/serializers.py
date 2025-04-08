@@ -318,7 +318,7 @@ class RecipeCreateUpdateSerializer(RecipeBaseSerialiser):
 class FollowSerializer(CustomUserSerializer):
     """Сериализатор для подписок с информацией о рецептах."""
 
-    recipes = RecipeBriefSerializer(read_only=True, many=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -347,3 +347,15 @@ class FollowSerializer(CustomUserSerializer):
     def get_recipes_count(self, obj):
         """Возвращает количество рецептов автора."""
         return obj.recipes.all().count()
+
+    def get_recipes(self, obj):
+        """Возвращает рецепты автора с учетом заданного лимита в запросе."""
+        recipes = obj.recipes.all()
+        recipes_limit = self.context.get('recipes_limit')
+        print(recipes_limit)
+
+        if recipes_limit is not None:
+            recipes = recipes[:int(recipes_limit)]
+
+        serializer = RecipeBriefSerializer(recipes, many=True, read_only=True)
+        return serializer.data

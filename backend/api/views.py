@@ -250,13 +250,16 @@ class CustomUserViewSet(mixins.CreateModelMixin,
     def subscriptions(self, request):
         """Возвращает список подписок пользователя с пагинацией."""
         authors = User.objects.filter(followers__follower=request.user)
+        recipes_limit = request.query_params.get('recipes_limit')
 
         paginator = CatsPagination()
         paginated_authors = paginator.paginate_queryset(authors, request)
+        context = self.get_serializer_context()
+        context['recipes_limit'] = recipes_limit
         serializer = FollowSerializer(
             paginated_authors,
             many=True,
-            context=self.get_serializer_context()
+            context=context
         )
         return paginator.get_paginated_response(serializer.data)
 
@@ -265,8 +268,10 @@ class CustomUserViewSet(mixins.CreateModelMixin,
     def subscribe(self, request, pk=None):
         """Добавляет/удаляет подписку на автора."""
         user = request.user
+        recipes_limit = request.query_params.get('recipes_limit')
         author = get_object_or_404(User, pk=pk)
         context = self.get_serializer_context()
+        context['recipes_limit'] = recipes_limit
         serializer = FollowSerializer(author, context=context)
         sub = Follow.objects.filter(author=author, follower=user).first()
 
