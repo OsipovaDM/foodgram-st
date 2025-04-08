@@ -7,10 +7,20 @@ from django.core.files.base import ContentFile
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from warnings import warn
 
 from cooking.models import (
     Recipe, Ingredient, Composition, User, Follow
 )
+
+
+class BaseSerialiser(serializers.ModelSerializer):
+    class Meta:
+        abstract = True
+
+    @property
+    def request_user(self):
+        return self.context['request'].user
 
 
 class Base64ImageField(serializers.ImageField):
@@ -34,7 +44,7 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class CustomUserSerializer(UserSerializer):
+class CustomUserSerializer(UserSerializer, BaseSerialiser):
     """Сериализатор для модели пользователя с кастомными полями."""
 
     email = serializers.EmailField(
@@ -70,7 +80,7 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         """Проверяет, подписан ли текущий пользователь на автора."""
-        user = self.context['request'].user
+        user = self.request_user
         if user.is_authenticated:
             return obj.authors.filter(author=user).exists()
         return False
@@ -102,7 +112,7 @@ class AvatarSerializer(serializers.ModelSerializer):
         fields = ('avatar',)
 
 
-class PasswordSerializer(serializers.ModelSerializer):
+class PasswordSerializer(BaseSerialiser):
     """Сериализатор для изменения пароля пользователя."""
 
     new_password = serializers.CharField(
@@ -122,14 +132,14 @@ class PasswordSerializer(serializers.ModelSerializer):
 
     def validate_current_password(self, value):
         """Проверяет корректность текущего пароля."""
-        user = self.context['request'].user
+        user = self.request_user
         if not check_password(value, user.password):
             raise serializers.ValidationError("Текущий пароль неверный")
         return value
 
     def validate_new_password(self, value):
         """Валидирует новый пароль."""
-        user = self.context['request'].user
+        user = self.request_user
         password_validation.validate_password(value, user)
         return value
 
@@ -172,7 +182,7 @@ class CompositionSerialiser(serializers.ModelSerializer):
         return amount
 
 
-class RecipeBaseSerialiser(serializers.ModelSerializer):
+class RecipeBaseSerialiser(BaseSerialiser):
     """Базовый сериализатор для рецептов с общими полями."""
 
     author = CustomUserSerializer(
@@ -204,19 +214,25 @@ class RecipeBaseSerialiser(serializers.ModelSerializer):
             return obj.image.url
         return None
 
+    def _check_user_relation(self, obj, relation_field):
+        """
+        Общий метод для проверки связи пользователя с рецептом.
+        Args:
+            obj: Объект рецепта
+            relation_field: Поле связи (choosers/buyers)
+        """
+        user = self.request_user
+        if user.is_authenticated:
+            return getattr(obj, relation_field).filter(id=user.id).exists()
+        return False
+
     def get_is_favorited(self, obj):
         """Проверяет, находится ли рецепт в избранном у пользователя."""
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return obj.choosers.filter(id=user.id).exists()
-        return False
+        return self._check_user_relation(obj, 'choosers')
 
     def get_is_in_shopping_cart(self, obj):
         """Проверяет, находится ли рецепт в списке покупок пользователя."""
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return obj.buyers.filter(id=user.id).exists()
-        return False
+        return self._check_user_relation(obj, 'buyers')
 
 
 class RecipeBriefSerializer(RecipeBaseSerialiser):
@@ -338,7 +354,7 @@ class FollowSerializer(CustomUserSerializer):
 
     def validate(self, attrs):
         """Проверяет, что пользователь не подписывается на себя."""
-        if self.context['request'].user == attrs['author']:
+        if self.request_user == attrs['author']:
             raise serializers.ValidationError(
                 {'author': 'Нельзя подписаться на самого себя'}
             )
@@ -353,6 +369,19 @@ class FollowSerializer(CustomUserSerializer):
         recipes = obj.recipes.all()
         recipes_limit = self.context.get('recipes_limit')
         print(recipes_limit)
+
+        if recipes_limit is not None:
+            try:
+                # Преобразуем в int и проверяем, что значение положительное
+                recipes_limit = int(recipes_limit)
+                if recipes_limit <= 0:
+                    warn(f"recipes_limit должен быть \
+                            положительным: {recipes_limit}", UserWarning)
+                    recipes_limit = None
+            except (ValueError, TypeError) as e:
+                warn(f"Invalid recipes_limit: {recipes_limit}. \
+                        Error: {str(e)}", UserWarning)
+                recipes_limit = None
 
         if recipes_limit is not None:
             recipes = recipes[:int(recipes_limit)]
