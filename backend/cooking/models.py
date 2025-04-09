@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model  # Модель пользова�
 from django.db import models  # Основная модель
 from django.urls import reverse
 
-from users.models import User
+User = get_user_model()
 
 
 class Recipe(models.Model):
@@ -46,7 +46,6 @@ class Recipe(models.Model):
     
     def get_absolute_url(self):
         return reverse("recipes-detail", kwargs={"pk": self.pk})
-    
 
 
 class BaseModel(models.Model):

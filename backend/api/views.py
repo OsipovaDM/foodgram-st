@@ -1,4 +1,5 @@
 from secrets import token_urlsafe
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from rest_framework import mixins, viewsets, status, permissions
@@ -7,7 +8,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 
 from cooking.models import (
-    Recipe, Ingredient, User, Follow, Favourites, ShoppingList, ShortLink
+    Recipe, Ingredient, Follow, Favourites, ShoppingList, ShortLink
 )
 from .serializers import (
     RecipeDetailSerializer, IngredientSerializer,
@@ -17,6 +18,8 @@ from .serializers import (
 )
 from .pagination import CatsPagination
 from .permissions import AuthorOrReadOnly
+
+User = get_user_model()
 
 
 @api_view(['GET'])

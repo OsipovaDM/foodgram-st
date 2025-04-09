@@ -27,7 +27,7 @@ class RecipeAdmin(admin.ModelAdmin):
     # Разрешение редактирование полей на странице списка объектов
     list_editable = ()
     # Разрешение поиска по полям
-    search_fields = ('author', 'name',)
+    search_fields = ('author__first_name', 'name',)
     # Разрешение фильтрации по полям
     list_filter = ()
     # Переход к редактированию при клике на поле

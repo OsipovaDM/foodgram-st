@@ -1,6 +1,6 @@
 import base64
 
-from django.contrib.auth import password_validation
+from django.contrib.auth import password_validation, get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.files.base import ContentFile
@@ -10,8 +10,10 @@ from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from warnings import warn
 
 from cooking.models import (
-    Recipe, Ingredient, Composition, User, Follow
+    Recipe, Ingredient, Composition, Follow
 )
+
+User = get_user_model()
 
 
 class BaseSerialiser(serializers.ModelSerializer):
