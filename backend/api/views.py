@@ -2,9 +2,10 @@ from secrets import token_urlsafe
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from rest_framework import mixins, viewsets, status, permissions
+from rest_framework import mixins, viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action, api_view
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from cooking.models import (
@@ -34,7 +35,7 @@ def redirect_short_link(request, abridged):
 class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для работы с рецептами (CRUD и дополнительные действия)."""
 
-    permission_classes = [AuthorOrReadOnly]
+    permission_classes = [AuthorOrReadOnly, IsAdminUser]
     serializer_class = RecipeDetailSerializer
     pagination_class = CatsPagination
 
@@ -133,7 +134,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'Рецепт отсутствует в избранном.'
         )
 
-    @action(['get'], False, permission_classes=[permissions.IsAuthenticated])
+    @action(['get'], False, permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         """Скачивает текстовый файл со списком покупок."""
         user = request.user
@@ -166,8 +167,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet для работы с ингредиентами (только чтение)."""
+class IngredientViewSet(viewsets.ModelViewSet):
+    """ViewSet для работы с ингредиентами."""
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
@@ -198,7 +199,7 @@ class CustomUserViewSet(mixins.CreateModelMixin,
             return CustomUserCreateSerializer
         return super().get_serializer_class()
 
-    @action(['get'], False, permission_classes=[permissions.IsAuthenticated])
+    @action(['get'], False, permission_classes=[IsAuthenticated])
     def me(self, request):
         """Возвращает информацию о текущем пользователе."""
         serializer = self.get_serializer(request.user)
@@ -238,7 +239,7 @@ class CustomUserViewSet(mixins.CreateModelMixin,
             return delete_handler()
 
     @action(['put', 'delete'], False, 'me/avatar',
-            permission_classes=[permissions.IsAuthenticated])
+            permission_classes=[IsAuthenticated])
     def avatar(self, request):
         """Обновляет или удаляет аватар пользователя."""
 
@@ -260,17 +261,35 @@ class CustomUserViewSet(mixins.CreateModelMixin,
                 {"avatar": request.user.avatar.url})
         )
 
-    @action(['post'], False, permission_classes=[permissions.IsAuthenticated])
-    def set_password(self, request):
-        """Изменяет пароль пользователя."""
+    @action(['post'], True, 'set_password', permission_classes=[IsAuthenticated])
+    def set_password(self, request, pk=None):
+        """
+        Изменение пароля:
+        - Для своего аккаунта (при pk=None)
+        - Для любого пользователя (если is_staff=True)
+        """
+        # Определяем целевого пользователя
+        if pk is None:
+            # Изменение своего пароля
+            user = request.user
+        else:
+            # Изменение чужого пароля (только для админов)
+            if not request.user.is_staff:
+                return Response(
+                    {'detail': 'Недостаточно прав'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            user = get_object_or_404(User, pk=pk)
+
+        # Обработка изменения пароля
         context = self.get_serializer_context()
         serializer = PasswordSerializer(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
-        request.user.set_password(serializer.validated_data['new_password'])
-        request.user.save()
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(['get'], False, permission_classes=[permissions.IsAuthenticated])
+    @action(['get'], False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         """Возвращает список подписок пользователя с пагинацией."""
         authors = User.objects.filter(followers__follower=request.user)
@@ -288,7 +307,7 @@ class CustomUserViewSet(mixins.CreateModelMixin,
         return paginator.get_paginated_response(serializer.data)
 
     @action(['post', 'delete'], True,
-            permission_classes=[permissions.IsAuthenticated])
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, pk=None):
         """Добавляет/удаляет подписку на автора."""
         user = request.user
@@ -320,4 +339,27 @@ class CustomUserViewSet(mixins.CreateModelMixin,
             )
 
         sub.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(['post'], True, permission_classes=[IsAdminUser])
+    def block(self, request, pk=None):
+        """Блокировка пользователя (is_active=False)."""
+        user = get_object_or_404(User, pk=pk)
+        user.is_active = False
+        user.save()
+        return Response({'status': 'Пользователь заблокирован'}, status=status.HTTP_200_OK)
+
+    @action(['post'], True, permission_classes=[IsAdminUser])
+    def unblock(self, request, pk=None):
+        """Разблокировка пользователя (is_active=True)."""
+        user = get_object_or_404(User, pk=pk)
+        user.is_active = True
+        user.save()
+        return Response({'status': 'Пользователь разблокирован'}, status=status.HTTP_200_OK)
+
+    @action(['delete'], True, permission_classes=[IsAdminUser])
+    def delete(self, request, pk=None):
+        """Полное удаление пользователя."""
+        user = get_object_or_404(User, pk=pk)
+        user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

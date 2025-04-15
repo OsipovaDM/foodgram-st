@@ -122,7 +122,7 @@ REST_FRAMEWORK = {
 
     # Пагинация
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
+    'PAGE_SIZE': 6,
 
     # Динамическая спецификация
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',

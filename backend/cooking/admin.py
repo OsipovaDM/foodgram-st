@@ -3,12 +3,13 @@ from django.utils.safestring import mark_safe
 
 from .models import (
     Recipe, Ingredient, Composition,
-    Follow, Favourites, ShoppingList)
+    Follow, Favourites, ShoppingList, ShortLink)
 
 admin.site.register(Composition)
 admin.site.register(Follow)
 admin.site.register(Favourites)
 admin.site.register(ShoppingList)
+admin.site.register(ShortLink)
 
 
 @admin.register(Recipe)
@@ -36,8 +37,11 @@ class RecipeAdmin(admin.ModelAdmin):
     empty_value_display = 'Не задано'
 
     def favourites_count(self, obj):
+        """Возвращает количество добавлений рецепта в избранное с человекочитаемым заголовком"""
         result = Favourites.objects.filter(recipe=obj).count()
         return mark_safe(result)
+
+    favourites_count.short_description = 'В избранном (раз)'
 
 
 @admin.register(Ingredient)

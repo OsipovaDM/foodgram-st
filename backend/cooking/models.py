@@ -31,11 +31,13 @@ class Recipe(models.Model):
         through="ShoppingList",
         related_name="purchases",
     )
+    created = models.DateTimeField('Дата-время создания записи', auto_now=True)
 
     class Meta:
         constraints = (
             models.UniqueConstraint(fields=('author', 'name'), name='RecipeUK'),
         )
+        ordering = ['-created',]
         # Человекочитаемое имя
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
