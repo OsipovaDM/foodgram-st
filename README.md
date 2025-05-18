@@ -32,6 +32,6 @@
   - docker exec foodgram-st-backend-1 python manage.py migrate
   - docker exec foodgram-st-backend-1 python manage.py loaddata ingredients_fixtures.json
   - docker exec foodgram-st-backend-1 python manage.py collectstatic
-  - docker exec foodgram-st-backend-1 mkdir backend_static/
-  - docker exec foodgram-st-backend-1 mkdir backend_static/static/
-  - docker exec foodgram-st-backend-1 cp -r collected_static/. backend_static/static/
+  <!-- - docker exec foodgram-st-backend-1 mkdir backend_static/
+  - docker exec foodgram-st-backend-1 mkdir backend_static/static/ -->
+  - docker exec foodgram-st-backend-1 cp -r collected_static/. ../backend_static/static/
