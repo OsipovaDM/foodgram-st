@@ -35,7 +35,7 @@ def redirect_short_link(request, abridged):
 class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для работы с рецептами (CRUD и дополнительные действия)."""
 
-    permission_classes = [AuthorOrReadOnly, IsAdminUser]
+    permission_classes = [AuthorOrReadOnly | IsAdminUser]
     serializer_class = RecipeDetailSerializer
     pagination_class = CatsPagination
 
@@ -167,7 +167,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class IngredientViewSet(viewsets.ModelViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet для работы с ингредиентами."""
 
     queryset = Ingredient.objects.all()
@@ -261,25 +261,33 @@ class CustomUserViewSet(mixins.CreateModelMixin,
                 {"avatar": request.user.avatar.url})
         )
 
-    @action(['post'], True, 'set_password', permission_classes=[IsAuthenticated])
+    @action(['post'], False, 'set_password', permission_classes=[IsAuthenticated])
     def set_password(self, request, pk=None):
         """
         Изменение пароля:
-        - Для своего аккаунта (при pk=None)
+        - Для своего аккаунта
+
+        """
+        context = self.get_serializer_context()
+        serializer = PasswordSerializer(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+        request.user.set_password(serializer.validated_data['new_password'])
+        request.user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(['post'], True, 'set_password', permission_classes=[IsAuthenticated])
+    def set_password_admin(self, request, pk=None):
+        """
+        Изменение пароля:
         - Для любого пользователя (если is_staff=True)
         """
-        # Определяем целевого пользователя
-        if pk is None:
-            # Изменение своего пароля
-            user = request.user
-        else:
-            # Изменение чужого пароля (только для админов)
-            if not request.user.is_staff:
-                return Response(
-                    {'detail': 'Недостаточно прав'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-            user = get_object_or_404(User, pk=pk)
+        # Изменение чужого пароля (только для админов)
+        if not request.user.is_staff:
+            return Response(
+                {'detail': 'Недостаточно прав'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        user = get_object_or_404(User, pk=pk)
 
         # Обработка изменения пароля
         context = self.get_serializer_context()

@@ -12,7 +12,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User, verbose_name='Автор', on_delete=models.CASCADE, related_name='recipes')
     name = models.CharField(
-        'Название', max_length=50)
+        'Название', max_length=256)
     image = models.ImageField(
         'Картинка', upload_to='pictures/')
     text = models.TextField(
@@ -76,9 +76,9 @@ class Ingredient(models.Model):
     Модель для хранения информации об ингредиентах
     '''
     name = models.CharField(
-        'Название', max_length=50, unique=True)
+        'Название', max_length=128, unique=True)
     measurement_unit = models.CharField(
-        'Единица измерения', max_length=50)
+        'Единица измерения', max_length=64)
 
     class Meta:
         # Человекочитаемое имя
@@ -155,7 +155,7 @@ class ShoppingList(BaseModel):
 class ShortLink(models.Model):
     """Описывает короткие ссылки на рецепты"""
 
-    origin = models.URLField('Исходная ссылка на рецепт ', max_length=200, unique=True)
+    origin = models.URLField('Исходная ссылка на рецепт ', max_length=255, unique=True)
     abridged = models.CharField('Код рецепта', max_length=50, unique=True)
 
     class Meta:

@@ -16,16 +16,8 @@
 
 - НЕ реализовано:
   - Статические страницы
-  - Пагинация проекта по 6  +
-  - ++ Переадресация должна быть со стороны фронтэнда  ++
-  - Главная страница -- список рецептов (фронт) +
-  - Сортировка рецептов в подписках от новых к старым (дата по убыванию) --> добавить дату создания в модель  +
-  - сохранение аватара по умолчанию +
-  - права администратора  +
-  - нужны дополнительные эндпоинты???
+  - права администратора нужны дополнительные эндпоинты???
   - нужны ли права (добавления,редактирования,удаления) ингредиентов для администратора???
-  - модель ссылок в админке +
-  - favourites_count добавить человекочитаемый ярлык  +
   - 
   - PostgreSQL
   - requirements.txt
@@ -36,3 +28,10 @@
   - тестовые данные
   - README
 
+- Для нормальной работы контейнеров:
+  - docker exec foodgram-st-backend-1 python manage.py migrate
+  - docker exec foodgram-st-backend-1 python manage.py loaddata ingredients_fixtures.json
+  - docker exec foodgram-st-backend-1 python manage.py collectstatic
+  - docker exec foodgram-st-backend-1 mkdir backend_static/
+  - docker exec foodgram-st-backend-1 mkdir backend_static/static/
+  - docker exec foodgram-st-backend-1 cp -r collected_static/. backend_static/static/
