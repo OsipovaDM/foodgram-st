@@ -261,7 +261,8 @@ class CustomUserViewSet(mixins.CreateModelMixin,
                 {"avatar": request.user.avatar.url})
         )
 
-    @action(['post'], False, 'set_password', permission_classes=[IsAuthenticated])
+    @action(['post'], False, 'set_password',
+            permission_classes=[IsAuthenticated])
     def set_password(self, request, pk=None):
         """
         Изменение пароля:
@@ -275,7 +276,8 @@ class CustomUserViewSet(mixins.CreateModelMixin,
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(['post'], True, 'set_password', permission_classes=[IsAuthenticated])
+    @action(['post'], True, 'set_password',
+            permission_classes=[IsAuthenticated])
     def set_password_admin(self, request, pk=None):
         """
         Изменение пароля:
@@ -355,7 +357,8 @@ class CustomUserViewSet(mixins.CreateModelMixin,
         user = get_object_or_404(User, pk=pk)
         user.is_active = False
         user.save()
-        return Response({'status': 'Пользователь заблокирован'}, status=status.HTTP_200_OK)
+        return Response({'status': 'Пользователь заблокирован'},
+                        status=status.HTTP_200_OK)
 
     @action(['post'], True, permission_classes=[IsAdminUser])
     def unblock(self, request, pk=None):
@@ -363,7 +366,8 @@ class CustomUserViewSet(mixins.CreateModelMixin,
         user = get_object_or_404(User, pk=pk)
         user.is_active = True
         user.save()
-        return Response({'status': 'Пользователь разблокирован'}, status=status.HTTP_200_OK)
+        return Response({'status': 'Пользователь разблокирован'},
+                        status=status.HTTP_200_OK)
 
     @action(['delete'], True, permission_classes=[IsAdminUser])
     def delete(self, request, pk=None):

@@ -1,26 +1,44 @@
-from django.contrib.auth import get_user_model  # Модель пользователя
-from django.db import models  # Основная модель
+from django.contrib.auth import get_user_model
+from django.db import models
 from django.urls import reverse
 
 User = get_user_model()
 
 
 class Recipe(models.Model):
-    '''
-    Модель для хранения информации о рецептах
-    '''
+    """
+    Модель рецепта с основной информацией о кулинарном рецепте.
+
+    Attributes:
+        author (ForeignKey): Ссылка на автора рецепта
+        name (CharField): Название рецепта
+        image (ImageField): Изображение блюда
+        text (TextField): Подробное описание рецепта
+        cooking_time (PositiveIntegerField): Время приготовления в минутах
+        ingredients (ManyToManyField): Связь с ингредиентами через Composition
+        choosers (ManyToManyField): Пользователи, добавившие в избранное
+        buyers (ManyToManyField): Пользователи, добавившие в список покупок
+        created (DateTimeField): Дата и время создания
+    """
+
     author = models.ForeignKey(
-        User, verbose_name='Автор', on_delete=models.CASCADE, related_name='recipes')
-    name = models.CharField(
-        'Название', max_length=256)
-    image = models.ImageField(
-        'Картинка', upload_to='pictures/')
-    text = models.TextField(
-        'Текстовое описание')
+        User,
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='recipes'
+    )
+    name = models.CharField('Название', max_length=256)
+    image = models.ImageField('Картинка', upload_to='pictures/')
+    text = models.TextField('Текстовое описание')
     cooking_time = models.PositiveIntegerField(
-        'Время приготовления', help_text='В минутах')
+        'Время приготовления',
+        help_text='В минутах'
+    )
     ingredients = models.ManyToManyField(
-        to="Ingredient", through="Composition", related_name="recipes",)
+        to="Ingredient",
+        through="Composition",
+        related_name="recipes"
+    )
     choosers = models.ManyToManyField(
         to="users.User",
         through="Favourites",
@@ -31,137 +49,200 @@ class Recipe(models.Model):
         through="ShoppingList",
         related_name="purchases",
     )
-    created = models.DateTimeField('Дата-время создания записи', auto_now=True)
+    created = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=('author', 'name'), name='RecipeUK'),
+            models.UniqueConstraint(
+                fields=('author', 'name'),
+                name='unique_author_recipe'
+            ),
         )
-        ordering = ['-created',]
-        # Человекочитаемое имя
+        ordering = ['-created']
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
 
-    # Отображение при обращении к объекту
     def __str__(self):
-        return self.name
-    
+        return f'{self.name} (автор: {self.author.username})'
+
     def get_absolute_url(self):
+        """Возвращает абсолютный URL для доступа к деталям рецепта."""
         return reverse("recipes-detail", kwargs={"pk": self.pk})
 
 
 class BaseModel(models.Model):
-    '''
-    Абстрактная модель.
-    Добавляет к модели связь с рецептом и пользователем
-    '''
+    """
+    Абстрактная базовая модель для связей пользователь-рецепт.
+
+    Attributes:
+        recipe (ForeignKey): Ссылка на рецепт
+        user (ForeignKey): Ссылка на пользователя
+    """
+
     recipe = models.ForeignKey(
-        Recipe, verbose_name='Рецепт', on_delete=models.CASCADE, related_name='+')
+        Recipe,
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+        related_name='+'
+    )
     user = models.ForeignKey(
-        User, verbose_name='Пользователь', on_delete=models.CASCADE, related_name='+')
+        User,
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+        related_name='+'
+    )
 
     class Meta:
-        constraints = (
-            models.UniqueConstraint(fields=('user', 'recipe'), name='UserRecipe'),
-        )
         abstract = True
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_user_recipe'
+            ),
+        )
 
-    # Отображение при обращении к объекту
     def __str__(self):
-        return self.user.__str__() + ' -- ' + self.recipe.__str__()
+        return f'{self.user} -> {self.recipe}'
 
 
 class Ingredient(models.Model):
-    '''
-    Модель для хранения информации об ингредиентах
-    '''
+    """
+    Модель ингредиента с единицами измерения.
+
+    Attributes:
+        name (CharField): Название ингредиента (уникальное)
+        measurement_unit (CharField): Единица измерения
+    """
+
     name = models.CharField(
-        'Название', max_length=128, unique=True)
+        'Название',
+        max_length=128,
+        unique=True
+    )
     measurement_unit = models.CharField(
-        'Единица измерения', max_length=64)
+        'Единица измерения',
+        max_length=64
+    )
 
     class Meta:
-        # Человекочитаемое имя
         verbose_name = 'ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
-    # Отображение при обращении к объекту
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.measurement_unit})'
 
 
 class Composition(models.Model):
-    '''
-    Модель связывает рецепты и ингредиенты
-    '''
+    """
+    Промежуточная модель для связи рецептов и
+    ингредиентов с указанием количества.
+
+    Attributes:
+        recipe (ForeignKey): Ссылка на рецепт
+        ingredient (ForeignKey): Ссылка на ингредиент
+        amount (PositiveIntegerField): Количество ингредиента
+    """
+
     recipe = models.ForeignKey(
-        Recipe, verbose_name='Рецепт', on_delete=models.CASCADE, related_name='component')
+        Recipe,
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+        related_name='components'
+    )
     ingredient = models.ForeignKey(
-        Ingredient, verbose_name='Ингредиент', on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField(
-        'Количество')
+        Ingredient,
+        verbose_name='Ингредиент',
+        on_delete=models.CASCADE
+    )
+    amount = models.PositiveIntegerField('Количество')
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=('recipe', 'ingredient'), name='RecipeIngridient'),
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique_recipe_ingredient'
+            ),
         )
-        # Человекочитаемое имя
         verbose_name = 'состав'
         verbose_name_plural = 'Составы'
 
+    def __str__(self):
+        return f'{self.recipe}: {self.ingredient} - {self.amount}'
+
 
 class Follow(models.Model):
-    '''
-    Модель связывает пользователей
-    с авторами рецептов, на которых они подписаны
-    '''
+    """
+    Модель подписки пользователей на авторов рецептов.
+
+    Attributes:
+        author (ForeignKey): Автор рецептов
+        follower (ForeignKey): Подписчик
+    """
+
     author = models.ForeignKey(
-        User, verbose_name='Автор', on_delete=models.CASCADE, related_name='followers')
+        User,
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='followers'
+    )
     follower = models.ForeignKey(
-        User, verbose_name='Подписчик', on_delete=models.CASCADE, related_name='authors')
+        User,
+        verbose_name='Подписчик',
+        on_delete=models.CASCADE,
+        related_name='following'
+    )
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=('author', 'follower'), name='AuthorFollower'),
-            models.CheckConstraint(check=~models.Q(author=models.F('follower')), name='author_not_follower'),
+            models.UniqueConstraint(
+                fields=('author', 'follower'),
+                name='unique_author_follower'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(author=models.F('follower')),
+                name='prevent_self_follow'
+            ),
         )
-        # Человекочитаемое имя
-        verbose_name = 'автор -- подписчик '
+        verbose_name = 'подписка'
         verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.follower} подписан на {self.author}'
 
 
 class Favourites(BaseModel):
-    '''
-    Модель связывает избранные рецепты с пользователями
-    '''
+    """Модель для хранения избранных рецептов пользователей."""
 
     class Meta:
-        # Человекочитаемое имя
         verbose_name = 'избранное'
         verbose_name_plural = 'Избранное'
 
 
 class ShoppingList(BaseModel):
-    '''
-    Модель связывает пользователей и рецепты, добавленные в список покупок
-    '''
+    """Модель для хранения списков покупок пользователей."""
 
     class Meta:
-        # Человекочитаемое имя
         verbose_name = 'список покупок'
         verbose_name_plural = 'Списки покупок'
 
 
 class ShortLink(models.Model):
-    """Описывает короткие ссылки на рецепты"""
+    """
+    Модель для сокращенных ссылок на рецепты.
 
-    origin = models.URLField('Исходная ссылка на рецепт ', max_length=255, unique=True)
-    abridged = models.CharField('Код рецепта', max_length=50, unique=True)
+    Attributes:
+        origin (URLField): Оригинальная ссылка
+        abridged (CharField): Сокращенный код
+    """
+
+    origin = models.URLField('Оригинальная ссылка',
+                             max_length=255, unique=True)
+    abridged = models.CharField('Сокращенный код',
+                                max_length=50, unique=True)
 
     class Meta:
-        # Человекочитаемое имя
-        verbose_name = 'перенаправление ссылки'
-        verbose_name_plural = 'Перенаправление ссылок'
+        verbose_name = 'сокращенная ссылка'
+        verbose_name_plural = 'Сокращенные ссылки'
 
     def __str__(self):
-        return f'{self.origin} <--> {self.abridged}'
+        return f'Ссылка {self.abridged}'

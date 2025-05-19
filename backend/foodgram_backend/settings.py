@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',  # API
     'users.apps.UsersConfig',  # Переопределение пользователя
     'rest_framework',  # Фреймворк DRF https://www.cdrf.co/#version-3.14
-    'rest_framework.authtoken', # 
+    'rest_framework.authtoken',
     'django_filters',  # Фильтрация https://django-filter.readthedocs.io/en/stable/guide/usage.html
     'djoser',  # JWT-аутентификация
     'drf_spectacular'  # Динамическая спецификация
@@ -127,7 +127,6 @@ AUTH_USER_MODEL = 'users.User'  # Переопределенная модель 
 # JWT authentication
 # https://djoser.readthedocs.io/en/latest/getting_started.html#available-endpoints
 REST_FRAMEWORK = {
-    # 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -147,7 +146,6 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

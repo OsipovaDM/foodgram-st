@@ -1,9 +1,16 @@
 from rest_framework.pagination import PageNumberPagination
 
 
-# https://www.django-rest-framework.org/api-guide/pagination/
 class CatsPagination(PageNumberPagination):
-    '''
-    Пагинатор. Возможность указание размера страницы в параметрах запроса
-    '''
+    """
+    Кастомный пагинатор для API, позволяющий клиенту указывать размер страницы.
+
+    Наследуется от стандартного PageNumberPagination DRF.
+    Добавляет возможность динамического изменения размера
+    страницы через параметр запроса.
+
+    Attributes:
+        page_size_query_param (str): Имя параметра запроса
+        для указания размера страницы. По умолчанию 'limit'.
+    """
     page_size_query_param = 'limit'

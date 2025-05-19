@@ -1,0 +1,9 @@
+POSTGRES_USER=django_user
+POSTGRES_PASSWORD=mysecretpassword
+POSTGRES_DB=foodgram_db
+DB_HOST=db
+DB_PORT=5432
+ALLOWED_HOSTS=100.0.0.1,127.0.0.1,localhost
+SECRET_KEY=django-insecure-12345
+DEBUG_MODE=True
+USE_SQLITE=False
