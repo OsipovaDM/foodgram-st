@@ -147,7 +147,7 @@ class Composition(models.Model):
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='components'
+        related_name='component'
     )
     ingredient = models.ForeignKey(
         Ingredient,
@@ -189,7 +189,7 @@ class Follow(models.Model):
         User,
         verbose_name='Подписчик',
         on_delete=models.CASCADE,
-        related_name='following'
+        related_name='authors'
     )
 
     class Meta:
@@ -199,7 +199,7 @@ class Follow(models.Model):
                 name='unique_author_follower'
             ),
             models.CheckConstraint(
-                check=~models.Q(author=models.F('follower')),
+                check=~models.Q(author=models.F('author_not_follower')),
                 name='prevent_self_follow'
             ),
         )
