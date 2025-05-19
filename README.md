@@ -15,21 +15,14 @@
   - что такое to_internal_value
 
 - НЕ реализовано:
-  - Статические страницы
-  - права администратора нужны дополнительные эндпоинты???
-  - нужны ли права (добавления,редактирования,удаления) ингредиентов для администратора???
-  - 
-  - PostgreSQL  +
-  - requirements.txt  +
-  - запуск из контейнеров nginx, PostgreSQL, backend и frontend через docker-compose  +
-  - хранение данных в volumes +
-  - образы на Docker Hub (текущая попытка)
-  - CI/CD через GitHub Actions (текущая попытка)
-  - тестовые данные
+  - Статические страницы  (реализация не требуется)
+  - образы на Docker Hub  +
+  - CI/CD через GitHub Actions  +
+  - тестовые данные +
   - README
 
 - Для нормальной работы контейнеров:
+  - docker compose up --build
   - docker exec foodgram-st-backend-1 python manage.py migrate
-  - docker exec foodgram-st-backend-1 python manage.py loaddata ingredients_fixtures.json
+  - docker exec foodgram-st-backend-1 python manage.py loaddata data_fixtures.json
   - docker exec foodgram-st-backend-1 python manage.py collectstatic
-  - docker exec foodgram-st-backend-1 cp -r collected_static/. ../backend_static/static/

@@ -25,7 +25,7 @@ services:
     env_file: .env
     # Тут подключаем volume к backend
     volumes:
-      - static:/backend_static
+      - static:/app/collected_static
       - media:/app/media
     # Какие контейнеры нужно запустить до старта этого контейнера:
     depends_on:
