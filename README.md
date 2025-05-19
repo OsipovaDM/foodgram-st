@@ -19,12 +19,12 @@
   - права администратора нужны дополнительные эндпоинты???
   - нужны ли права (добавления,редактирования,удаления) ингредиентов для администратора???
   - 
-  - PostgreSQL
-  - requirements.txt
-  - запуск из контейнеров nginx, PostgreSQL, backend и frontend через docker-compose
-  - хранение данных в volumes
-  - образы на Docker Hub
-  - CI/CD через GitHub Actions
+  - PostgreSQL  +
+  - requirements.txt  +
+  - запуск из контейнеров nginx, PostgreSQL, backend и frontend через docker-compose  +
+  - хранение данных в volumes +
+  - образы на Docker Hub (текущая попытка)
+  - CI/CD через GitHub Actions (текущая попытка)
   - тестовые данные
   - README
 
