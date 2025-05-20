@@ -199,8 +199,8 @@ class Follow(models.Model):
                 name='unique_author_follower'
             ),
             models.CheckConstraint(
-                check=~models.Q(author=models.F('author_not_follower')),
-                name='prevent_self_follow'
+                check=~models.Q(author=models.F('follower')),
+                name='author_not_follower'
             ),
         )
         verbose_name = 'подписка'
